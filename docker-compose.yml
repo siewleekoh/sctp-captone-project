@@ -3,18 +3,16 @@ services:
   restaurant_backend:
     container_name: restaurant_backend
     build:
-      context: .
-      dockerfile:
-        ./backend/Dockerfile
+      context: ./backend
+      dockerfile: ./Dockerfile
     ports:
       - "9999:80"
 
   restaurant_frontend:
     container_name: restaurant_frontend
     build:
-      context: .
-      dockerfile:
-        ./frontend/Dockerfile
+      context: ./frontend/
+      dockerfile: ./Dockerfile
     ports:
       - "7777:3000"
     depends_on:
