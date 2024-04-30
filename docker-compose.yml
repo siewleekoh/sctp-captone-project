@@ -1,0 +1,10 @@
+version: "3"
+services:
+  restaurant_backend:
+    container_name: restaurant_backend
+    build:
+      context: .
+      dockerfile:
+        Dockerfile
+    ports:
+      - "9999:80"
