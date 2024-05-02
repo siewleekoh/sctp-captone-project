@@ -1,0 +1,29 @@
+version: "3"
+networks:
+  restaurant-network:
+    driver: bridge
+
+services:
+  backend:
+    container_name: webserver
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "8888:8888"
+    restart: on-failure
+    networks:
+      - restaurant-network
+
+  frontend:
+    container_name: website
+    build:
+      context: ./frontend/
+      dockerfile: ./Dockerfile
+    ports:
+      - "7777:8080"
+    restart: on-failure
+    networks:
+      - restaurant-network
+    depends_on:
+      - backend

@@ -1,12 +1,18 @@
 import mysql from "mysql2";
 
-// create the connection to database
+// manage environment variables
+import * as dotenv from "dotenv";
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
+
+// create the connection to database
 const db = mysql.createConnection({
-    host: "ce5-group2.chheppac9ozc.us-east-1.rds.amazonaws.com",
-    user: "admin",
-    password: "8k-G1^-k",
-    database: "db_restaurant"
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USERNAME,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE
 });
 
 
