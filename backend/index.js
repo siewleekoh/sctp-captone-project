@@ -12,6 +12,13 @@ import cors from "cors";
 // import routes
 import router from "./routes/routes.js";
 
+// manage environment variables
+import * as dotenv from "dotenv";
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
+
 // init express
 const app = express();
 
@@ -39,7 +46,7 @@ app.get('/', function(req, res){
 });
 
 // PORT
-const PORT = process.env.PORT || 8888;
+const PORT = process.env.BACKEND_PORT || 8888;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
