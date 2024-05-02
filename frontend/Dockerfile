@@ -1,20 +1,5 @@
-# # build stage
-# FROM node:lts-alpine as build-stage
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-# RUN npm run build
-
-# # production stage
-# FROM nginx:stable-alpine as production-stage
-# COPY --from=build-stage /app/dist /usr/share/nginx/html
-# EXPOSE 8080
-# CMD ["nginx", "-g", "daemon off;"]
-
-
 # Specify the base image
-FROM node:14
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /app
