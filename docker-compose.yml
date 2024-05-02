@@ -11,7 +11,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8888:8888"
-    # restart: on-failure
+    restart: on-failure
     networks:
       - restaurant-network
 
@@ -22,7 +22,7 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "7777:8080"
-    # restart: on-failure
+    restart: on-failure
     networks:
       - restaurant-network
     depends_on:
