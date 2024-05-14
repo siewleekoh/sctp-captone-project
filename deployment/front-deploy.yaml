@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-front
+spec:
+  replicas: 1   # set to 0 as can't connect to db. set to 1 if want to start at least one 
+  selector:
+    matchLabels:
+      app: order-front
+  template:
+    metadata:
+      labels:
+        app: order-front
+    spec:
+      containers:
+      - name: front-container
+        image: public.ecr.aws/u2q1a2y8/order-front
+        ports: 
+          - containerPort: 8080
