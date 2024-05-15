@@ -3,7 +3,7 @@
 - To set up your local environment, rename `secrets.tfvars.example` to `secrets.tfvars` with updated aws secrets. 
 - `secrets.tfvars` is in `.gitignore` and will not be committed.
 
-
+### Running terraform
 - To start terraform
 
 ```
@@ -28,3 +28,9 @@ terraform apply -var-file="secrets.tfvars"
 ```
 terraform destroy -var-file="secrets.tfvars"
 ```
+
+### To access the EKS cluster
+- To change EKS context for `kubectl` to the newly created cluster
+
+```
+aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
