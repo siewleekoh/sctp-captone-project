@@ -2,63 +2,70 @@
 # Load Balancer Role
 ################################################################################
 
-module "aws_load_balancer_controller_irsa_role" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.3.1"
+module "lb_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name = "aws-load-balancer-controller"
-
+  role_name                              = "ce5_group2_eks_lb"
   attach_load_balancer_controller_policy = true
 
   oidc_providers = {
-    ex = {
+    main = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
     }
   }
 }
 
-
-
 ################################################################################
 # Aws Load balancer Controller Service Account
 ################################################################################
-#
-#resource "kubernetes_service_account" "service-account" {
-#  metadata {
-#    name      = "aws-load-balancer-controller"
-#    namespace = "kube-system"
-#    labels = {
-#      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
-#      "app.kubernetes.io/component" = "controller"
-#    }
-#    annotations = {
-#      "eks.amazonaws.com/role-arn"               = module.lb_role.iam_role_arn
-#      "eks.amazonaws.com/sts-regional-endpoints" = "true"
-#    }
-#  }
-#}
+
+resource "kubernetes_service_account" "service-account" {
+  metadata {
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    labels = {
+      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
+      "app.kubernetes.io/component" = "controller"
+    }
+    annotations = {
+      "eks.amazonaws.com/role-arn"               = module.lb_role.iam_role_arn
+      "eks.amazonaws.com/sts-regional-endpoints" = "true"
+    }
+  }
+}
 
 ################################################################################
 # Install Load Balancer Controler With Helm
 ################################################################################
 
-resource "helm_release" "aws_load_balancer_controller" {
-  name = "aws-load-balancer-controller"
-
+resource "helm_release" "lb" {
+  name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
-  version    = "1.4.4"
+  #  depends_on = [
+  #    kubernetes_service_account.service-account
+  #  ]
 
   set {
-    name  = "replicaCount"
-    value = 1
+    name  = "region"
+    value = var.aws_region
   }
 
   set {
-    name  = "clusterName"
-    value = module.eks.cluster_id
+    name  = "vpcId"
+    value = var.vpc_id
+  }
+
+  set {
+    name  = "image.repository"
+    value = "602401143452.dkr.ecr.${var.aws_region}.amazonaws.com/amazon/aws-load-balancer-controller"
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
   }
 
   set {
@@ -67,7 +74,7 @@ resource "helm_release" "aws_load_balancer_controller" {
   }
 
   set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.aws_load_balancer_controller_irsa_role.iam_role_arn
+    name  = "clusterName"
+    value = var.eks_cluster_name
   }
 }
