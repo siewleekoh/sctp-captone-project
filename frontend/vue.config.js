@@ -4,6 +4,16 @@ module.exports = defineConfig({
   transpileDependencies: true
 });
 
+module.exports = {
+  devServer: {
+    allowedHosts: [
+      'localhost',
+      '.sctp-sandbox.com',
+    ],
+  },
+};
+
+
 // module.exports = {
 //   outputDir: path.resolve(__dirname, '../backend/public'),
 //   devServer: {
