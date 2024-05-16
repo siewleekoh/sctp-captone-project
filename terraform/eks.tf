@@ -2,9 +2,12 @@
 
 # local EKS variables
 locals {
-  cluster_name = "ce5-group2-eks-test-terraform"
-  node_group_name = "ce5-group2-node-group"
-  instance_types = ["t2.micro"]
+  cluster_name          = var.eks_cluster_name
+  node_group_name       = "ce5-group2-node-group"
+  instance_types        = ["t2.micro"]
+  instance_min_size     = 10
+  instance_max_size     = 15
+  instance_desired_size = 10
 }
 
 # Filter out local zones, which are not currently supported
@@ -52,18 +55,17 @@ module "eks" {
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
-  cluster_addons = {
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
-    }
-  }
+  #  cluster_addons = {
+  #    aws-ebs-csi-driver = {
+  #      service_account_role_arn = module.irsa-ebs-csi.iam_role_arn
+  #    }
+  #  }
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
-
   }
 
   eks_managed_node_groups = {
@@ -72,26 +74,49 @@ module "eks" {
 
       instance_types = local.instance_types
 
-      min_size     = 10
-      max_size     = 15
-      desired_size = 10
+      min_size     = local.instance_min_size
+      max_size     = local.instance_max_size
+      desired_size = local.instance_desired_size
     }
   }
 }
 
 
-# https://aws.amazon.com/blogs/containers/amazon-ebs-csi-driver-is-now-generally-available-in-amazon-eks-add-ons/
-data "aws_iam_policy" "ebs_csi_policy" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+## https://aws.amazon.com/blogs/containers/amazon-ebs-csi-driver-is-now-generally-available-in-amazon-eks-add-ons/
+#data "aws_iam_policy" "ebs_csi_policy" {
+#  arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+#}
+#
+#module "irsa-ebs-csi" {
+#  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+#  version = "5.39.0"
+#
+#  create_role                   = true
+#  role_name                     = "AmazonEKSTFEBSCSIRole-${module.eks.cluster_name}"
+#  provider_url                  = module.eks.oidc_provider
+#  role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
+#  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+#}
+
+# https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2009
+data "aws_eks_cluster" "default" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks.eks_managed_node_groups, ]
 }
 
-module "irsa-ebs-csi" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "5.39.0"
+data "aws_eks_cluster_auth" "default" {
+  name       = module.eks.cluster_name
+  depends_on = [module.eks.eks_managed_node_groups, ]
+}
 
-  create_role                   = true
-  role_name                     = "AmazonEKSTFEBSCSIRole-${module.eks.cluster_name}"
-  provider_url                  = module.eks.oidc_provider
-  role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.default.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.default.certificate_authority[0].data)
+  # token                  = data.aws_eks_cluster_auth.default.token
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.default.id]
+    command     = "aws"
+  }
 }
