@@ -8,10 +8,9 @@ variable "aws_secret_key" {
   sensitive = true
 }
 
-variable "vpc_id" {
-  description = "default VPC"
-  type        = string
-  default     = "vpc-0aa58eaabb536e7d3"
+variable "aws_account_id" {
+  type      = string
+  sensitive = true
 }
 
 variable "aws_region" {
@@ -20,20 +19,18 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-# variable "ecs_container_port" {
-#     description = "ECS container port"
-#     type        = number
-#     default     = 3000
-# }
-
-variable "ecr_url" {
-    description = "ECR URL"
-    type        = string
-    default     = "255945442255.dkr.ecr.us-east-1.amazonaws.com"
+variable "eks_cluster_name" {
+  description = "EKS cluster name"
+  type        = string
+  default     = "ce5-group2-eks-terraform"
 }
 
-variable "ecr_image_name" {
-    description = "ECR image name"
-    type        = string
-    default     = "siewlee-test"
+variable "user1_name" {
+  type        = string
+  default = "lfchin23"
+}
+
+variable "user2_name" {
+  type        = string
+  default = "jonathan"
 }
