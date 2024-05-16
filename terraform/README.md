@@ -29,8 +29,18 @@ terraform apply -var-file="secrets.tfvars"
 terraform destroy -var-file="secrets.tfvars"
 ```
 
+- If encountering issue deleting resources, list resources and manually remove it in AWS console and run `terraform destroy` again
+```
+terraform state list
+terraform destroy -var-file="secrets.tfvars"
+```
+
+
 ### To access the EKS cluster
 - To change EKS context for `kubectl` to the newly created cluster
 
 ```
 aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+```
+
+
