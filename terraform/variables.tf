@@ -24,3 +24,23 @@ variable "eks_cluster_name" {
   type        = string
   default     = "ce5-group2-eks-terraform"
 }
+
+variable "user1_name" {
+  type        = string
+  default = "lfchin23"
+}
+
+variable "user2_name" {
+  type        = string
+  default = "jonathan"
+}
+
+variable "mysql_username" {
+  type      = string
+  sensitive = true
+}
+
+variable "mysql_password" {
+  type      = string
+  sensitive = true
+}
