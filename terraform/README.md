@@ -1,6 +1,6 @@
 ## Local development
 
-- To set up your local environment, rename `secrets.tfvars.example` to `secrets.tfvars` with updated aws secrets. 
+- To set up your local environment, copy and rename `secrets.tfvars.example` to `secrets.tfvars` with updated aws secrets. 
 - `secrets.tfvars` is in `.gitignore` and will not be committed.
 
 ### Running terraform
