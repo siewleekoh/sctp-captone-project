@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "rds-subnet-group" {
   name       = "my-rds-private-subnet-group"
-  subnet_ids = var.vpc_private_subnets //module.main-vpc.vpc_private_subnets
+  subnet_ids = var.vpc_private_subnets
 
   tags = {
     Name = "rds-subnet-group"
@@ -10,13 +10,13 @@ resource "aws_db_subnet_group" "rds-subnet-group" {
 resource "aws_security_group" "mysql_db_sg" {
   name        = "ce5-group2-mysql-sg"
   description = "Allow MySQL traffic"
-  vpc_id      = var.vpc_id //module.main-vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = var.vpc_private_subnets_cidr_blocks //module.main-vpc.vpc_private_subnets_cidr_blocks
+    cidr_blocks = var.vpc_private_subnets_cidr_blocks
   }
 
   egress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "mysql_db_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  depends_on = [ //module.main-vpc,
+  depends_on = [
   aws_db_subnet_group.rds-subnet-group]
 }
 
