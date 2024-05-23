@@ -28,6 +28,7 @@ metadata:
   labels:
     app: restaurant-api
 spec:
+  type: ClusterIP
   selector:
     app: restaurant-api
   ports:
