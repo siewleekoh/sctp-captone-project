@@ -4,7 +4,7 @@ module "main-vpc"{
 
 resource "aws_db_subnet_group" "rds-subnet-group" {
   name       = "my-rds-subnet-group"
-  subnet_ids = module.main-vpc.vpc_private_subnets //private_subnets
+  subnet_ids = module.main-vpc.vpc_private_subnets
 
   tags = {
     Name = "rds-subnet-group"
@@ -61,12 +61,13 @@ resource "aws_db_instance" "ce5-group2-mysql" {
 #}
 
 resource "null_resource" "main_db_update_table" {
+  depends_on = ["aws_db_instance.ce5-group2-mysql", "aws_security_group.mysql_db_sg"]
 
-  provisioner "local-exec" {
-    on_failure = "fail"
-    interpreter = ["/bin/bash", "-c"]
-    command = <<EOT
-        mysql -h ${aws_db_instance.ce5-group2-mysql.endpoint}  -u ${var.mysql_username} -p${var.mysql_password} ${aws_db_instance.ce5-group2-mysql.address} < ./create_tables.sql
-     EOT
-  }
+#  provisioner "local-exec" {
+#    on_failure = "fail"
+#    interpreter = ["/bin/bash", "-c"]
+#    command = <<EOT
+#        mysql -h ${aws_db_instance.ce5-group2-mysql.endpoint}  -u ${var.mysql_username} -p${var.mysql_password} ${aws_db_instance.ce5-group2-mysql.address} < ./create_tables.sql
+#     EOT
+#  }
 }

@@ -8,6 +8,10 @@ locals {
   instance_desired_size = 10
 }
 
+module "main-vpc" {
+  source = "./vpc"
+}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.8.5"
@@ -24,8 +28,8 @@ module "eks" {
   #    }
   #  }
 
-  vpc_id     = module.main-vpc.vpc_id //.vpc.vpc_id
-  subnet_ids = module.main-vpc.vpc_private_subnets//vpc.private_subnets
+  vpc_id     = module.main-vpc.vpc_id
+  subnet_ids = module.main-vpc.vpc_private_subnets
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
