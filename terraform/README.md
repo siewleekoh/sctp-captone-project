@@ -10,6 +10,17 @@
 terraform init
 ```
 
+- To format terraform files
+
+```
+terraform fmt -recursive 
+```
+
+- To validate terraform files
+```
+    terraform validate
+```
+
 - To check resources that are going to be created and for any errors
 
 ```
