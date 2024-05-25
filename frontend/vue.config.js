@@ -10,9 +10,17 @@ module.exports = {
       'localhost',
       '.sctp-sandbox.com',
     ],
+    port: 8080,
+    proxy: {
+        '^/api': {
+            target: 'http://localhost:8888',
+            ws: true,
+            changeOrigin: true
+        }
+    }
+
   },
 };
-
 
 // module.exports = {
 //   outputDir: path.resolve(__dirname, '../backend/public'),

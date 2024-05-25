@@ -21,7 +21,7 @@ services:
       context: ./frontend/
       dockerfile: ./Dockerfile
     ports:
-      - "7777:8080"
+      - "8080:80"
     restart: on-failure
     networks:
       - restaurant-network
