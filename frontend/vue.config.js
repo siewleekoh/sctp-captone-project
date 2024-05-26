@@ -8,17 +8,9 @@ module.exports = {
   devServer: {
     allowedHosts: [
       'localhost',
-      '.sctp-sandbox.com',
+      process.env.VUE_APP_ALLOWED_HOST
+//      '.sctp-sandbox.com',
     ],
-    port: 8080,
-    proxy: {
-        '^/api': {
-            target: 'http://localhost:8888',
-            ws: true,
-            changeOrigin: true
-        }
-    }
-
   },
 };
 
