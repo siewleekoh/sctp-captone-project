@@ -17,6 +17,11 @@ spec:
       - name: frontend-container
         image: public.ecr.aws/u2q1a2y8/restaurant-frontend:latest
         imagePullPolicy: Always
+        env:
+          - name: HUB_HOST
+            value: backend-service.restaurant
+          - name: HUB_PORT
+            value: "8888"
         ports:
           - containerPort: 80
 #          - containerPort: 8080
@@ -35,7 +40,7 @@ spec:
     app: restaurant-app
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 7778
+      targetPort: 80
 #      port: 7778
 #      targetPort: 8080

@@ -1,5 +1,5 @@
 upstream backend {
-    server  webserver:8888;
+    server  ${HUB_HOST}:${HUB_PORT};
 }
 
 server {
