@@ -8,11 +8,10 @@ module.exports = {
   devServer: {
     allowedHosts: [
       'localhost',
-      '.sctp-sandbox.com',
+      process.env.VUE_APP_ALLOWED_HOST
     ],
   },
 };
-
 
 // module.exports = {
 //   outputDir: path.resolve(__dirname, '../backend/public'),

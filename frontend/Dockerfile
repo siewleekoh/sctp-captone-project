@@ -1,19 +1,15 @@
-FROM --platform=linux/amd64 node:18-alpine
-
-# Set the working directory
+FROM --platform=linux/amd64 node:18 as build-stage
 WORKDIR /app
-
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
+COPY ./ .
+RUN npm run build
 
-# Copy the rest of the application
-COPY . .
+FROM --platform=linux/amd64 nginx as production-stage
+RUN mkdir /app
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+RUN chmod 0755 /usr/share/nginx/html && chmod 0644 -R /usr/share/nginx/html/*
+RUN find /usr/share/nginx/html -type d -exec chmod 0755 {} \;
 
-# Expose the port
-EXPOSE 8080
-
-# Define the command to run the application
-CMD [ "npm", "run", "serve" ]
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx/nginx.conf /etc/nginx/nginx.conf

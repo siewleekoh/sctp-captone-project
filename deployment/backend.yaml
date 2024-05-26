@@ -16,6 +16,7 @@ spec:
       containers:
       - name: backend-container
         image: public.ecr.aws/u2q1a2y8/restaurant-backend:latest
+        imagePullPolicy: Always
         ports: 
           - containerPort: 8888
 
@@ -28,10 +29,11 @@ metadata:
   labels:
     app: restaurant-api
 spec:
+  type: ClusterIP
   selector:
     app: restaurant-api
   ports:
     - protocol: TCP
-      port: 7777
+      port: 8888
       targetPort: 8888
 

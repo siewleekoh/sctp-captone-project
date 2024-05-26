@@ -51,7 +51,7 @@ terraform destroy -var-file="secrets.tfvars"
 - To change EKS context for `kubectl` to the newly created cluster
 
 ```
-aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw eks_cluster_name)
 ```
 
 
