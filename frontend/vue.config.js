@@ -9,7 +9,6 @@ module.exports = {
     allowedHosts: [
       'localhost',
       process.env.VUE_APP_ALLOWED_HOST
-//      '.sctp-sandbox.com',
     ],
   },
 };
