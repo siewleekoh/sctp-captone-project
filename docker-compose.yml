@@ -20,8 +20,12 @@ services:
     build:
       context: ./frontend/
       dockerfile: ./Dockerfile
+    environment:
+      - HUB_HOST=webserver
+      - HUB_PORT=8888
+      - VUE_APP_ROOT_API=http://localhost:8888/api/v1
     ports:
-      - "7777:8080"
+      - "7778:80"
     restart: on-failure
     networks:
       - restaurant-network

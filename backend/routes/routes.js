@@ -47,72 +47,72 @@ const router = express.Router();
 
 ////////////////////////// FOOD ////////////////////////////////
 // get all Food
-router.get("/api/foods", showFoods);
+router.get("/api/v1/foods", showFoods);
 
 // get single Food 
-router.get("/api/foods/:id", showFoodById);
+router.get("/api/v1/foods/:id", showFoodById);
 
 // create Food
-router.post("/api/foods", createFood);
+router.post("/api/v1/foods", createFood);
 
 // update Food 
-router.put("/api/foods/:id", updateFood);
+router.put("/api/v1/foods/:id", updateFood);
 
 // delete Food
-router.delete("/api/foods/:id", deleteFood);
+router.delete("/api/v1/foods/:id", deleteFood);
 
 
 
 ////////////////////////// USER ////////////////////////////////
 // get all user
-router.get("/api/users/:email", showAUser);
+router.get("/api/v1/users/:email", showAUser);
 
 // create account
-router.post("/api/users/", createAccount);
+router.post("/api/v1/users/", createAccount);
 
 
 
 ////////////////////////// CART ////////////////////////////////
 // add to cart
-router.post("/api/cartItem", addItems);
+router.post("/api/v1/cartItem", addItems);
 
 // get a item in cart
-router.get("/api/cartItem/:user_id/:food_id", getItem);
+router.get("/api/v1/cartItem/:user_id/:food_id", getItem);
 
 // get all items by user id
-router.get("/api/cartItem/:id", allItems);
+router.get("/api/v1/cartItem/:id", allItems);
 
 // update item qty
-router.put("/api/cartItem/", updateItem);
+router.put("/api/v1/cartItem/", updateItem);
 
 // delete a item in cart
-router.delete("/api/cartItem/:user_id/:food_id", deleteItem);
+router.delete("/api/v1/cartItem/:user_id/:food_id", deleteItem);
 
 // delete all items in cart
-router.delete("/api/cartItem/:id", deleteItems);
+router.delete("/api/v1/cartItem/:id", deleteItems);
 
 
 
 ////////////////////////// Booking ////////////////////////////////
-router.post("/api/booking", createBooking);
+router.post("/api/v1/booking", createBooking);
 
 
 
 ////////////////////////// Bill Details ////////////////////////////////
-router.post("/api/billdetails", createBillDetails);
-router.get("/api/billdetails/:id", getBillDetailsById);
+router.post("/api/v1/billdetails", createBillDetails);
+router.get("/api/v1/billdetails/:id", getBillDetailsById);
 
 
 
 ////////////////////////// Bill Status ////////////////////////////////
-router.get("/api/billstatus/new", showNewestStatusId);
-router.post("/api/billstatus", createBillStatus);
-router.get("/api/billstatus/user/:id", getAllBillsByUser);
-router.get("/api/billstatus/bill/:id", getAllBillsByBill);
-router.get("/api/billstatus", getAllBills);
-router.put("/api/billstatus/:id", updateBillStatus);
-router.put("/api/billstatus/paid/:id", updateBillPaid);
-router.put("/api/billstatus/cancel/:id", cancelBillStatus);
+router.get("/api/v1/billstatus/new", showNewestStatusId);
+router.post("/api/v1/billstatus", createBillStatus);
+router.get("/api/v1/billstatus/user/:id", getAllBillsByUser);
+router.get("/api/v1/billstatus/bill/:id", getAllBillsByBill);
+router.get("/api/v1/billstatus", getAllBills);
+router.put("/api/v1/billstatus/:id", updateBillStatus);
+router.put("/api/v1/billstatus/paid/:id", updateBillPaid);
+router.put("/api/v1/billstatus/cancel/:id", cancelBillStatus);
 
 
 
