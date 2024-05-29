@@ -28,6 +28,11 @@ resource "aws_security_group" "mysql_db_sg" {
 
   depends_on = [
   aws_db_subnet_group.rds-subnet-group]
+
+  tags = {
+    owner = "ce5-group2"
+  }
+
 }
 
 
@@ -46,4 +51,8 @@ resource "aws_db_instance" "ce5-group2-mysql" {
   vpc_security_group_ids = [aws_security_group.mysql_db_sg.id]
 
   skip_final_snapshot = true
+
+  tags = {
+    owner = "ce5-group2"
+  }
 }
