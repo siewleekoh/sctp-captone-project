@@ -42,6 +42,10 @@ module "eks" {
       desired_size = local.instance_desired_size
     }
   }
+
+  tags = {
+    owner = "ce5-group2"
+  }
 }
 
 
