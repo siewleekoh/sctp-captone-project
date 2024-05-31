@@ -19,7 +19,7 @@ insert diagram here
 
 This is an application running on Vue with a mySQL database based on this [repo](https://github.com/Quanghihicoder/restaurant-ordering-system).
 
-## Local development
+## App Deployment
 
 - To set up environmental variables in your local environment, rename `backend/.env.example` to `backend/.env` and 
 `frontend/.env.example` to `backend/.env` with updated variables.
