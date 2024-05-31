@@ -1,5 +1,5 @@
 // import connection
-import db from "../config/database.js";
+import db from "../utils/database.js";
 
 // insert Bill Details
 export const insertBillDetails = (data,result) => {

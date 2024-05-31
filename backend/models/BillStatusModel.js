@@ -1,5 +1,5 @@
 // import connection
-import db from "../config/database.js";
+import db from "../utils/database.js";
 
 // get newest Bill Status
 export const getNewestId = (result) => {
