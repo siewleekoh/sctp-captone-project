@@ -1,4 +1,23 @@
-### Manual Deployment
+## Local development in docker-compose
+
+- To start the frontend and backend containers.
+
+```
+cd docker-compose
+docker-compose up
+```
+
+- To rebuild new images without using the cache.
+
+```
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+
+
+
+## Manual Deployment to AWS EKS
 
 1. Log in to the cluster
 
@@ -30,6 +49,7 @@ kubectl config set-context --current --namespace=restaurant
 6. Deploy the frontend and ingress
 
 ```
+cd kubernetes
 kubectl apply -f frontend.yaml
 kubectl apply -f ingress.yaml
 ```
