@@ -8,7 +8,7 @@ import {
     deleteFoodById,
 } from "../models/FoodModel.js";
 
-'import logger from '../utils/logger.js';
+import logger from '../utils/logger.js';
 
 // get all Foods
 export const showFoods=(req,res)=>{
