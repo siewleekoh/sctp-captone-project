@@ -19,24 +19,16 @@ insert diagram here
 
 This is an application running on Vue with a mySQL database based on this [repo](https://github.com/Quanghihicoder/restaurant-ordering-system).
 
-## Local development
+Landing Page            |  Menu Page
+:-------------------------:|:-------------------------:
+![](docs/images/landing_page.png)  |  ![](docs/images/menu.png)
+
+
+## App Deployment
 
 - To set up environmental variables in your local environment, rename `backend/.env.example` to `backend/.env` and 
 `frontend/.env.example` to `backend/.env` with updated variables.
-
-- To start the frontend and backend containers.  
-
-```
-docker-compose up
-```
-
-- To rebuild new images without using the cache.
-
-```
-docker-compose down
-docker-compose build --no-cache
-docker-compose up
-```
+- Refer to the `deployment` folder for instructions in deployment in dockers or AWS EKS kubernetes
 
 ## Deploying fluentd to enable pod logging 
 

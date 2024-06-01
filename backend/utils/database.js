@@ -1,4 +1,5 @@
 import mysql from "mysql2";
+import logger from './logger.js';
 
 // manage environment variables
 import * as dotenv from "dotenv";
@@ -19,6 +20,7 @@ const db = mysql.createConnection({
 db.connect(error => {
   if (error) throw error;
   console.log("Successfully connected to the database.");
+  logger.info("Successfully connected to the database.");
 });
 
 export default db;
