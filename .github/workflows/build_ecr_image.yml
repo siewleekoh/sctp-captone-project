@@ -2,6 +2,8 @@ name: Build and push Frontend/Backend image to ECR
 run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
 on:
   push:
+    branches:
+      - feature/ci-build-docker-image-ecr
     paths:
       - '../backend/**'
       - '../frontend/**'
