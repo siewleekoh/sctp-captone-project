@@ -33,6 +33,7 @@ jobs:
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
+          echo "$CHANGED_FILES" 
           if echo "$CHANGED_FILES" | grep -q "^backend/"; then
             echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
           elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
