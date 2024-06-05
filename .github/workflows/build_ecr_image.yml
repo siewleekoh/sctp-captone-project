@@ -1,0 +1,86 @@
+name: Build and push Frontend/Backend image to ECR
+run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
+on:
+  push:
+    paths:
+      - '../backend/**'
+      - '../frontend/**'
+env:
+  ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+      - name: pwd
+        run: pwd
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Login to AWS ECR
+        id: login-ecr
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
+      - name: Determine changed folder
+        id: determine-folder
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
+          if echo "$CHANGED_FILES" | grep -q "^backend/"; then
+            echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
+          elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
+            echo "FOLDER_CHANGED=frontend" >> $GITHUB_ENV
+          else
+            echo "No relevant changes detected."
+            exit 1
+          fi
+
+      - name: Build and push Docker image for backend
+        working-directory: ./backend
+        if: env.FOLDER_CHANGED == 'backend'
+        env:
+          IMAGE_TAG: latest
+        run: |
+          docker build -t ${{ vars.BACKEND_IMAGE_NAME }} .
+          docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
+
+      - name: Build and push Docker image for frontend
+        working-directory: ./frontend
+        if: env.FOLDER_CHANGED == 'frontend'
+        env:
+          IMAGE_TAG: latest
+        run: |
+          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} .
+          docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
+      
+      
+      
+      
+      
+      
+
+#
+#      - name: Frontend docker build and tag
+#        run: |
+#          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} .
+#          docker tag ${{ vars.IMAGE_NAME }}:latest ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
+#      - name: Run frontend image scan
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: '${{ vars.FRONTEND_IMAGE_NAME }}:latest'
+#          format: 'table'
+#          # exit-code: '1'
+#          ignore-unfixed: true
+#          vuln-type: 'os,library'
+#          severity: 'MEDIUM,HIGH,CRITICAL'
+#          output: 'frontend-docker-image-scan.json'
+#      - name: Upload Docker Trivy Report
+#        uses: actions/upload-artifact@v4.3.0
+#        with:
+#          name: docker-image-scan
+#          path: docker-image-scan.json
+#      - name: Docker publish to ECR
+#        run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
