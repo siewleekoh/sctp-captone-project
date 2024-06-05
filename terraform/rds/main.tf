@@ -1,12 +1,11 @@
 resource "aws_db_subnet_group" "rds-subnet-group" {
-  name       = "my-rds-private-subnet-group"
+  name       = "ce5-group2-rds-private-subnet-group"
   subnet_ids = var.vpc_private_subnets
 
   tags = {
     Name = "rds-subnet-group"
   }
 }
-
 resource "aws_security_group" "mysql_db_sg" {
   name        = "ce5-group2-mysql-sg"
   description = "Allow MySQL traffic"
