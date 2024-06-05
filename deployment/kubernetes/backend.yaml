@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend-container
-        image: public.ecr.aws/u2q1a2y8/restaurant-backend:latest
+        image: public.ecr.aws/u2q1a2y8/ce5-group2-backend:latest
         imagePullPolicy: Always
         ports: 
           - containerPort: 8888

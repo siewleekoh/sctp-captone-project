@@ -31,27 +31,29 @@ aws eks update-kubeconfig --name ce5-group2-eks-terraform --region us-east-1
 kubectl get services 
 ```
 
-3. Create a namespace for the application
+4. Switch namespace (note: `restaurant` namespace has already been created in terraform)
 
 ```
-kubectl create namespace restaurant
-```
-
-4. Switch namespace
-
-```
-kubectl config get-contexts 
 kubectl config set-context --current --namespace=restaurant
 ```
 
 5. Build frontend and backend container docker images and push to ECR if necessary. Update the image url in the deployment files.
 
-6. Deploy the frontend and ingress
+6. Deploy the frontend, backend and ingress
 
 ```
 cd kubernetes
-kubectl apply -f frontend.yaml
-kubectl apply -f ingress.yaml
+kubectl apply -f backend.yaml --namespace=restaurant
+kubectl apply -f frontend.yaml --namespace=restaurant
+kubectl apply -f ingress.yaml --namespace=restaurant
 ```
 
-7. Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
+7. To view resources created  
+```
+kubectl get services -n=restaurant 
+kubectl get deployment -n=restaurant 
+kubectl get pods -n=restaurant
+kubectl logs <pod-name> -n=restaurant 
+```
+
+8Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
