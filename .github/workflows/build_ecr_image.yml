@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches:
-      - feature/ci-build-docker-image-ecr
+#    branches:
+#      - feature/ci-build-docker-image-ecr
     paths:
       - '../backend/**'
       - '../frontend/**'
@@ -34,7 +34,7 @@ jobs:
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
           echo "$CHANGED_FILES" 
-          if echo "$CHANGED_FILES" | grep -q "^backend/"; then
+          if echo "$CHANGED_FILES" | grep "^backend/"; then
             echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
           elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
             echo "FOLDER_CHANGED=frontend" >> $GITHUB_ENV
