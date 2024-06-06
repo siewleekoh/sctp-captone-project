@@ -1,24 +1,24 @@
 name: Build and push Frontend/Backend image to ECR
 run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
 on:
-  pull_request:
+  # pull_request:
   workflow_dispatch:
-    push:
-      branches:
-        - feature/ci-build-docker-image-ecr
-      paths:
-        - '../backend/**'
-        - '../frontend/**'
+  # push:
+  #   # branches:
+  #   #   - feature/ci-build-docker-image-ecr
+  #   paths:
+  #     - '../backend/**'
+  #     - '../frontend/**'
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4.1.5
-      - name: pwd
-        run: pwd
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+           fetch-depth: 0
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -28,16 +28,11 @@ jobs:
       - name: Login to AWS ECR
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-      - name: Determine changed folder
-        id: determine-folder
+      - name: Get changed files
+        id: changed-files
         run: |
-          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "$GITHUB_SHA" 
-          echo ${{ env.$GITHUB_SHA }}
-          echo "REV=$(git rev-parse HEAD)" >> $GITHUB_ENV
-          echo "$rREVev"
-          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
-          echo "$CHANGED_FILES" 
+          echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES"
           if echo "$CHANGED_FILES" | grep "^backend/"; then
             echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
           elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
@@ -46,7 +41,7 @@ jobs:
             echo "No relevant changes detected."
             exit 1
           fi
-
+            
       - name: Build and push Docker image for backend
         working-directory: ./backend
         if: env.FOLDER_CHANGED == 'backend'
