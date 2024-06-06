@@ -35,13 +35,29 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v37
   
-      - name: List all changed files
+      # - name: List all changed files
+      #   run: |
+      #     echo '# FILES with tj-actions/changed-files' >> "${GITHUB_STEP_SUMMARY}"
+      #     echo '' >> "${GITHUB_STEP_SUMMARY}"
+      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+      #     files_list=${{ steps.changed-files.outputs.all_changed_files }}
+      #     for file in ${files_list}; do
+      #       echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
+      #     done
+
+      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+      #     # save files into variable
+      #     printf 'THE_FILES=%s\n' "${files_list}" >> "${GITHUB_ENV}"
+
+      - name: Get changed files manually
         run: |
-          echo '# FILES with tj-actions/changed-files' >> "${GITHUB_STEP_SUMMARY}"
+          files_list="$(git diff --name-only ${{ github.event.before }} HEAD | xargs)"
+          echo '# Files with git command' >> "${GITHUB_STEP_SUMMARY}"
           echo '' >> "${GITHUB_STEP_SUMMARY}"
           echo '```' >> "${GITHUB_STEP_SUMMARY}"
 
-          files_list=${{ steps.changed-files.outputs.all_changed_files }}
           for file in ${files_list}; do
             echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
           done
@@ -54,7 +70,7 @@ jobs:
       - name: Get docker image names
         shell: python
         env:
-          PROJECT_IMAGE_MAP: '{"backend": ${{ vars.BACKEND_IMAGE_NAME }}, "frontend": ${{ vars.FRONTEND_IMAGE_NAME }}}'
+          PROJECT_IMAGE_MAP: '{"backend": "${{ vars.BACKEND_IMAGE_NAME }}", "frontend": "${{ vars.FRONTEND_IMAGE_NAME }}"}'
         run: |
           from os import environ
           import json
@@ -63,6 +79,7 @@ jobs:
           files = environ.get("THE_FILES").split(' ')
           print(files)
           proj_image_map = json.loads(environ.get("PROJECT_IMAGE_MAP"))
+          print(proj_image_map)
 
           images = []
 
