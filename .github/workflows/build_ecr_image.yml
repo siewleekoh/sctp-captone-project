@@ -1,14 +1,14 @@
 name: Build and push Frontend/Backend image to ECR
 run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
 on:
-  workflow_dispatch:
   pull_request:
-  push:
-#    branches:
-#      - feature/ci-build-docker-image-ecr
-    paths:
-      - '../backend/**'
-      - '../frontend/**'
+  workflow_dispatch:
+    push:
+      branches:
+        - feature/ci-build-docker-image-ecr
+      paths:
+        - '../backend/**'
+        - '../frontend/**'
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
@@ -32,6 +32,10 @@ jobs:
         id: determine-folder
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "$GITHUB_SHA" 
+          echo ${{ env.$GITHUB_SHA }}
+          echo "REV=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "$rREVev"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA)
           echo "$CHANGED_FILES" 
           if echo "$CHANGED_FILES" | grep "^backend/"; then
