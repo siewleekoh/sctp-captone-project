@@ -20,16 +20,6 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - name: Login to AWS ECR
-        id: login-ecr
-        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-        
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -45,7 +35,8 @@ jobs:
           echo '' >> "${GITHUB_STEP_SUMMARY}"
           echo '```' >> "${GITHUB_STEP_SUMMARY}"
 
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          files_list=${{ steps.changed-files.outputs.all_changed_files }}
+          for file in ${files_list}; do
             echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
           done
 
@@ -57,13 +48,14 @@ jobs:
       - name: Get docker image names
         shell: python
         env:
-          PROJECT_IMAGE_MAP: '{"backend": "docker-image-1", "frontend": "docker-image-2"}'
+          PROJECT_IMAGE_MAP: '{"backend": vars.BACKEND_IMAGE_NAME, "frontend": vars.FRONTEND_IMAGE_NAME}'
         run: |
           from os import environ
           import json
           
           # split files string into list. Divide by spaces
           files = environ.get("THE_FILES").split(' ')
+          print(files)
           proj_image_map = json.loads(environ.get("PROJECT_IMAGE_MAP"))
 
           images = []
@@ -94,7 +86,19 @@ jobs:
       - name: Print image name from matrix
         run: |
           echo "${{ matrix.image }}"
-          
+
+
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Login to AWS ECR
+        id: login-ecr
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
+        
       - name: Build and push Docker image for backend
         working-directory: ./backend
         if: env.FOLDER_CHANGED == 'backend'
