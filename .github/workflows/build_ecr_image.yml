@@ -3,22 +3,117 @@ run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions ðŸ
 on:
   pull_request:
   workflow_dispatch:
-  # push:
-  #   # branches:
-  #   #   - feature/ci-build-docker-image-ecr
-  #   paths:
-  #     - '../backend/**'
-  #     - '../frontend/**'
+      inputs:
+        branch:
+          description: 'The branch to build'
+          required: true
+        environment:
+          description: 'The environment to deploy to'
+          required: false
+  push:
+    branches:
+      - feature/ci-build-docker-image-ecr
+
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
-  build-and-push:
+  check-for-image-to-build:
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+    outputs:
+      IMAGES_TO_BUILD: ${{ steps.set_images.outputs.IMAGES_TO_BUILD }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
            fetch-depth: 0
+
+      - name: Get changed files with predefined action
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+  
+      # - name: List all changed files
+      #   run: |
+      #     echo '# FILES with tj-actions/changed-files' >> "${GITHUB_STEP_SUMMARY}"
+      #     echo '' >> "${GITHUB_STEP_SUMMARY}"
+      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+      #     files_list=${{ steps.changed-files.outputs.all_changed_files }}
+      #     for file in ${files_list}; do
+      #       echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
+      #     done
+
+      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+      #     # save files into variable
+      #     printf 'THE_FILES=%s\n' "${files_list}" >> "${GITHUB_ENV}"
+
+      - name: Get changed files manually
+        run: |
+          files_list="$(git diff --name-only ${{ github.event.before }} HEAD | xargs)"
+          echo '# Files with git command' >> "${GITHUB_STEP_SUMMARY}"
+          echo '' >> "${GITHUB_STEP_SUMMARY}"
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+          for file in ${files_list}; do
+            echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
+          done
+
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+          # save files into variable
+          printf 'THE_FILES=%s\n' "${files_list}" >> "${GITHUB_ENV}"
+           
+      - name: Get docker image names
+        shell: python
+        env:
+          PROJECT_IMAGE_MAP: '{"backend": "${{ vars.BACKEND_IMAGE_NAME }}", "frontend": "${{ vars.FRONTEND_IMAGE_NAME }}"}'
+        run: |
+          from os import environ
+          import json
+          
+          # split files string into list. Divide by spaces
+          files = environ.get("THE_FILES").split(' ')
+          print(files)
+          proj_image_map = json.loads(environ.get("PROJECT_IMAGE_MAP"))
+          print(proj_image_map)
+
+          images = []
+
+          # check if backend, frontend, etc is a part of changed file path
+          for file in files:
+            for k, v in proj_image_map.items():
+              if k in file:
+                if v not in images:
+                  images.append(v)
+
+          # save retreived images as json array
+          with open(environ.get("GITHUB_ENV"), 'a') as f:
+            f.write('IMAGES_TO_BUILD=' + json.dumps(images) + '\n')
+
+      - name: Set image names as output for matrix
+        id: set_images
+        run: |
+          echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
+
+  print_image_names_with_matrix:
+    name: "Build image: ${{ matrix.image }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{ fromJson( needs.get_manually.outputs.IMAGES_TO_BUILD ) }} 
+    steps:
+      - name: Print image name from matrix
+        run: |
+          echo "${{ matrix.image }}"
+
+
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -28,20 +123,7 @@ jobs:
       - name: Login to AWS ECR
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-      - name: Get changed files
-        id: changed-files
-        run: |
-          echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-          echo "$CHANGED_FILES"
-          if echo "$CHANGED_FILES" | grep "^backend/"; then
-            echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
-          elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
-            echo "FOLDER_CHANGED=frontend" >> $GITHUB_ENV
-          else
-            echo "No relevant changes detected."
-            exit 1
-          fi
-            
+        
       - name: Build and push Docker image for backend
         working-directory: ./backend
         if: env.FOLDER_CHANGED == 'backend'
