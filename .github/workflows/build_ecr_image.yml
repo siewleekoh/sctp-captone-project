@@ -3,22 +3,39 @@ run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions ðŸ
 on:
   pull_request:
   workflow_dispatch:
-  # push:
-  #   # branches:
-  #   #   - feature/ci-build-docker-image-ecr
-  #   paths:
-  #     - '../backend/**'
-  #     - '../frontend/**'
+  push:
+    branches:
+      - feature/ci-build-docker-image-ecr
+    # paths:
+    #   - '../backend/**'
+    #   - '../frontend/**'
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
-  build-and-push:
+  build-and-push-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
            fetch-depth: 0
+
+      - name: Get changed files with predefined action
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+  
+      - name: List all changed files
+        run: |
+          echo '# FILES with tj-actions/changed-files' >> "${GITHUB_STEP_SUMMARY}"
+          echo '' >> "${GITHUB_STEP_SUMMARY}"
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
+          done
+
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+           
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -29,19 +46,24 @@ jobs:
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
       - name: Get changed files
-        id: changed-files
+        id: changed-files2
         run: |
-          echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-          echo "$CHANGED_FILES"
-          if echo "$CHANGED_FILES" | grep "^backend/"; then
+          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+          echo "$changed_files"
+          if echo "$changed_files" | grep "^backend/"; then
             echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
-          elif echo "$CHANGED_FILES" | grep -q "^frontend/"; then
+          elif echo "$changed_files" | grep -q "^frontend/"; then
             echo "FOLDER_CHANGED=frontend" >> $GITHUB_ENV
           else
             echo "No relevant changes detected."
             exit 1
           fi
-            
+
+      - name: List changed files
+        run: |
+            for file in ${{ steps.changed-files2.outputs.changed_files }}; do
+                echo "$file was changed"
+            done
       - name: Build and push Docker image for backend
         working-directory: ./backend
         if: env.FOLDER_CHANGED == 'backend'
