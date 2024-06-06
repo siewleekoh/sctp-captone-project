@@ -17,7 +17,9 @@ on:
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
-  build-and-push-image:
+  check-for-image-to-build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -88,7 +90,9 @@ jobs:
           echo "${{ matrix.image }}"
 
 
-
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
