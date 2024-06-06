@@ -3,18 +3,33 @@ run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions ðŸ
 on:
   pull_request:
   workflow_dispatch:
+      inputs:
+        branch:
+          description: 'The branch to build'
+          required: true
+        environment:
+          description: 'The environment to deploy to'
+          required: false
   push:
     branches:
       - feature/ci-build-docker-image-ecr
-    # paths:
-    #   - '../backend/**'
-    #   - '../frontend/**'
+
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Login to AWS ECR
+        id: login-ecr
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
+        
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -35,35 +50,51 @@ jobs:
           done
 
           echo '```' >> "${GITHUB_STEP_SUMMARY}"
-           
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - name: Login to AWS ECR
-        id: login-ecr
-        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-      - name: Get changed files
-        id: changed-files2
-        run: |
-          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-          echo "$changed_files"
-          if echo "$changed_files" | grep "^backend/"; then
-            echo "FOLDER_CHANGED=backend" >> $GITHUB_ENV
-          elif echo "$changed_files" | grep -q "^frontend/"; then
-            echo "FOLDER_CHANGED=frontend" >> $GITHUB_ENV
-          else
-            echo "No relevant changes detected."
-            exit 1
-          fi
 
-      - name: List changed files
+          # save files into variable
+          printf 'THE_FILES=%s\n' "${files_list}" >> "${GITHUB_ENV}"
+           
+      - name: Get docker image names
+        shell: python
+        env:
+          PROJECT_IMAGE_MAP: '{"backend": "docker-image-1", "frontend": "docker-image-2"}'
         run: |
-            for file in ${{ steps.changed-files2.outputs.changed_files }}; do
-                echo "$file was changed"
-            done
+          from os import environ
+          import json
+          
+          # split files string into list. Divide by spaces
+          files = environ.get("THE_FILES").split(' ')
+          proj_image_map = json.loads(environ.get("PROJECT_IMAGE_MAP"))
+
+          images = []
+
+          # check if backend, frontend, etc is a part of changed file path
+          for file in files:
+            for k, v in proj_image_map.items():
+              if k in file:
+                if v not in images:
+                  images.append(v)
+
+          # save retreived images as json array
+          with open(environ.get("GITHUB_ENV"), 'a') as f:
+            f.write('IMAGES_TO_BUILD=' + json.dumps(images) + '\n')
+
+      - name: Set image names as output for matrix
+        id: set_images
+        run: |
+          echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
+
+  print_image_names_with_matrix:
+    name: "Build image: ${{ matrix.image }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{ fromJson( needs.get_manually.outputs.IMAGES_TO_BUILD ) }} 
+    steps:
+      - name: Print image name from matrix
+        run: |
+          echo "${{ matrix.image }}"
+          
       - name: Build and push Docker image for backend
         working-directory: ./backend
         if: env.FOLDER_CHANGED == 'backend'
