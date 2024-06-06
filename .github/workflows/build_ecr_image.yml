@@ -48,7 +48,7 @@ jobs:
       - name: Get docker image names
         shell: python
         env:
-          PROJECT_IMAGE_MAP: '{"backend": vars.BACKEND_IMAGE_NAME, "frontend": vars.FRONTEND_IMAGE_NAME}'
+          PROJECT_IMAGE_MAP: '{"backend": ${{ vars.BACKEND_IMAGE_NAME }}, "frontend": ${{ vars.FRONTEND_IMAGE_NAME }}}'
         run: |
           from os import environ
           import json
