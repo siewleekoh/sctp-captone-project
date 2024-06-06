@@ -19,7 +19,11 @@ env:
 jobs:
   check-for-image-to-build:
     permissions:
-      contents: write
+      id-token: write
+      contents: read
+      pull-requests: read
+    outputs:
+      IMAGES_TO_BUILD: ${{ steps.set_images.outputs.IMAGES_TO_BUILD }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
