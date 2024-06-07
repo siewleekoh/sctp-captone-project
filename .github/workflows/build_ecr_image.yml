@@ -113,6 +113,7 @@ jobs:
           array=${{ env.IMAGES_TO_BUILD }}
           for item in ${array[*]}
           do
+            echo item
             if [[ "$item" == ${{ vars.FRONTEND_IMAGE_NAME }} ]]; then
               echo ${{ env.IMAGES_TO_BUILD }}
               echo "Building frontend image"
@@ -128,6 +129,8 @@ jobs:
           array=${{ env.IMAGES_TO_BUILD }}
           for item in ${array[*]}
           do
+            echo item
+            echo "$item"
             if [[ "$item" == "${{ vars.BACKEND_IMAGE_NAME }}" ]]; then
               echo "should build backend image"
               echo ${{ env.IMAGES_TO_BUILD }}
