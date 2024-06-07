@@ -107,6 +107,7 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     needs: [check_for_image_to_build] #, print_image_names_with_matrix]
+    if: needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD != '[]'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -121,6 +122,10 @@ jobs:
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
 
+      # - name: Conditionally Run
+      #   if:   contains(env.IMAGES_TO_BUILD, 'SomeString')
+      #   run:  echo "SomeString did exist and should run"
+      
       - name: Build and push frontend image to ECR
         env:
           IMAGE_TAG: latest
@@ -131,8 +136,28 @@ jobs:
           echo "Building frontend image"
           docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
           docker tag ${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
+
+      - name: Run frontend image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+           image-ref: '${{ vars.FRONTEND_IMAGE_NAME }}:latest'
+           format: 'table'
+           # exit-code: '1'
+           ignore-unfixed: true
+           vuln-type: 'os,library'
+           severity: 'MEDIUM,HIGH,CRITICAL'
+           output: 'frontend-docker-image-scan.json'
+      - name: Upload Docker Trivy Report
+        uses: actions/upload-artifact@v4.3.0
+        with:
+           name: frontend-docker-image-scan
+           path: frontend-docker-image-scan.json
+      - name: Docker publish to ECR
+        run: |
           echo "Pushing frontend image to ECR"
           docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
+
+          
 
       - name: Build and push backend image to ECR
         if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.BACKEND_IMAGE_NAME }})
@@ -155,20 +180,20 @@ jobs:
 #        run: |
 #          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} .
 #          docker tag ${{ vars.IMAGE_NAME }}:latest ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
-#      - name: Run frontend image scan
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          image-ref: '${{ vars.FRONTEND_IMAGE_NAME }}:latest'
-#          format: 'table'
-#          # exit-code: '1'
-#          ignore-unfixed: true
-#          vuln-type: 'os,library'
-#          severity: 'MEDIUM,HIGH,CRITICAL'
-#          output: 'frontend-docker-image-scan.json'
-#      - name: Upload Docker Trivy Report
-#        uses: actions/upload-artifact@v4.3.0
-#        with:
-#          name: docker-image-scan
-#          path: docker-image-scan.json
-#      - name: Docker publish to ECR
-#        run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
+     - name: Run frontend image scan
+       uses: aquasecurity/trivy-action@master
+       with:
+         image-ref: '${{ vars.FRONTEND_IMAGE_NAME }}:latest'
+         format: 'table'
+         # exit-code: '1'
+         ignore-unfixed: true
+         vuln-type: 'os,library'
+         severity: 'MEDIUM,HIGH,CRITICAL'
+         output: 'frontend-docker-image-scan.json'
+     - name: Upload Docker Trivy Report
+       uses: actions/upload-artifact@v4.3.0
+       with:
+         name: docker-image-scan
+         path: docker-image-scan.json
+     - name: Docker publish to ECR
+       run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
