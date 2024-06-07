@@ -80,17 +80,28 @@ jobs:
           echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
 
 
-  # print_image_names_with_matrix:
-  #   name: "Build image: ${{ matrix.image }}"
-  #   runs-on: ubuntu-latest
-  #   needs: check_for_image_to_build
-  #   strategy:
-  #     matrix:
-  #       image: ${{ fromJson( needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD ) }} 
-  #   steps:
-  #     - name: Print image name from matrix
-  #       run: |
-  #         echo "${{ matrix.image }}"
+  print_image_names_with_matrix:
+    name: "Build image: ${{ matrix.image }}"
+    runs-on: ubuntu-latest
+    needs: check_for_image_to_build
+    strategy:
+      matrix:
+        image: ${{ fromJson( needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD ) }} 
+    steps:
+      - name: Check if IMAGES_TO_BUILD is empty
+        id: check_images_to_build
+        run: |
+          IMAGES_TO_BUILD_ARRAY=$(echo ${{ env.IMAGES_TO_BUILD }} | jq length)
+          echo $IMAGES_TO_BUILD_ARRAY
+          if [ "$IMAGES_TO_BUILD_ARRAY" -eq 0 ]; then
+            echo "No docker image to build and push. Exiting..."
+            exit 0
+          else
+            echo "IMAGES_TO_BUILD array is not empty."
+          fi
+      - name: Print image name from matrix
+        run: |
+          echo "${{ matrix.image }}"
 
 
   build-and-push-image:
