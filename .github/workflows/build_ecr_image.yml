@@ -74,7 +74,7 @@ jobs:
           with open(environ.get("GITHUB_ENV"), 'a') as f:
             f.write('IMAGES_TO_BUILD=' + json.dumps(images) + '\n')
 
-      - name: Set image names as output for matrix
+      - name: Set image names as output
         id: set_images
         run: |
           echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
@@ -131,12 +131,11 @@ jobs:
 
       
       - name: test
-        run:  |
+        run: |
           echo "${{ env.IMAGES_TO_BUILD }}"
           echo "${{ vars.FRONTEND_IMAGE_NAME }}"
           echo "${{ fromJson(env.IMAGES_TO_BUILD) }}"
-          echo "${{ contains(fromJson(env.IMAGES_TO_BUILD), '${{ vars.FRONTEND_IMAGE_NAME }}') }}
-          echo "${{ contains(fromJson('env.IMAGES_TO_BUILD'), '${{ vars.FRONTEND_IMAGE_NAME }}') }}
+          echo "${{ contains(fromJson(env.IMAGES_TO_BUILD), vars.FRONTEND_IMAGE_NAME) }}"
 
       
       - name: Build and push frontend image to ECR
