@@ -1,7 +1,7 @@
 name: Build and push Frontend/Backend image to ECR
 run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
 on:
-  pull_request:
+  # pull_request:
   workflow_dispatch:
       inputs:
         branch:
@@ -17,7 +17,7 @@ on:
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
 jobs:
-  check-for-image-to-build:
+  check_for_image_to_build:
     permissions:
       id-token: write
       contents: read
@@ -30,26 +30,6 @@ jobs:
         uses: actions/checkout@v3
         with:
            fetch-depth: 0
-
-      - name: Get changed files with predefined action
-        id: changed-files
-        uses: tj-actions/changed-files@v37
-  
-      # - name: List all changed files
-      #   run: |
-      #     echo '# FILES with tj-actions/changed-files' >> "${GITHUB_STEP_SUMMARY}"
-      #     echo '' >> "${GITHUB_STEP_SUMMARY}"
-      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
-
-      #     files_list=${{ steps.changed-files.outputs.all_changed_files }}
-      #     for file in ${files_list}; do
-      #       echo "$file was changed" >> "${GITHUB_STEP_SUMMARY}"
-      #     done
-
-      #     echo '```' >> "${GITHUB_STEP_SUMMARY}"
-
-      #     # save files into variable
-      #     printf 'THE_FILES=%s\n' "${files_list}" >> "${GITHUB_ENV}"
 
       - name: Get changed files manually
         run: |
@@ -99,9 +79,11 @@ jobs:
         run: |
           echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
 
+
   print_image_names_with_matrix:
     name: "Build image: ${{ matrix.image }}"
     runs-on: ubuntu-latest
+    needs: check_for_image_to_build
     strategy:
       matrix:
         image: ${{ fromJson( needs.get_manually.outputs.IMAGES_TO_BUILD ) }} 
@@ -113,6 +95,7 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: [check_for_image_to_build, print_image_names_with_matrix]
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -120,30 +103,31 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+          
       - name: Login to AWS ECR
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-        
-      - name: Build and push Docker image for backend
-        working-directory: ./backend
-        if: env.FOLDER_CHANGED == 'backend'
+
+      - name: Build and push frontend image to ECR
+        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.FRONTEND_IMAGE_NAME }})
         env:
           IMAGE_TAG: latest
         run: |
-          docker build -t ${{ vars.BACKEND_IMAGE_NAME }} .
+          echo "Building frontend image"
+          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
+          echo "Pushing frontend image to ECR"
+          docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
+
+      - name: Build and push backend image to ECR
+        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.BACKEND_IMAGE_NAME }})
+        env:
+          IMAGE_TAG: latest
+        run: |
+          docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
+          echo "Pushing backend image to ECR"
           docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
 
-      - name: Build and push Docker image for frontend
-        working-directory: ./frontend
-        if: env.FOLDER_CHANGED == 'frontend'
-        env:
-          IMAGE_TAG: latest
-        run: |
-          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} .
-          docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
-      
-      
-      
+
       
       
       
