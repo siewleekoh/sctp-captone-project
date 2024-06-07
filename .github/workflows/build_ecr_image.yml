@@ -130,6 +130,7 @@ jobs:
           echo ${{ env.IMAGES_TO_BUILD }}
           echo "Building frontend image"
           docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
+          docker tag ${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
           echo "Pushing frontend image to ECR"
           docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG
 
@@ -138,7 +139,9 @@ jobs:
         env:
           IMAGE_TAG: latest
         run: |
+          echo "Building backend image"
           docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
+          docker tag ${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
           echo "Pushing backend image to ECR"
           docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
 
