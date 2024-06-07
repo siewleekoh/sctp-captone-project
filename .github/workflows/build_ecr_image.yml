@@ -128,7 +128,7 @@ jobs:
           IMAGES_TO_BUILD:  ${{ needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD }}
         run: |
           echo ${{ env.IMAGES_TO_BUILD }}
-          echo contains(env.IMAGES_TO_BUILD, "${{ vars.FRONTEND_IMAGE_NAME }}")
+          echo ${{ contains(env.IMAGES_TO_BUILD, "${{ vars.FRONTEND_IMAGE_NAME }}") }}
           echo "Building frontend image"
           docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
           echo "Pushing frontend image to ECR"
