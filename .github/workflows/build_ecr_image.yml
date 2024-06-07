@@ -1,7 +1,6 @@
 name: Build and push Frontend/Backend image to ECR
 run-name: ${{ github.actor }} is running ECR build-and-push on GitHub Actions 🚀
 on:
-  # pull_request:
   workflow_dispatch:
       inputs:
         branch:
@@ -11,8 +10,9 @@ on:
           description: 'The environment to deploy to'
           required: false
   push:
-    branches:
-      - feature/ci-build-docker-image-ecr
+    paths:
+      - '../backend/**'
+      - '../frontend/**'
 
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
@@ -109,13 +109,11 @@ jobs:
 
       
       - name: Build and push frontend image to ECR
-        if: echo "${{ contains(fromJson(env.IMAGES_TO_BUILD), vars.FRONTEND_IMAGE_NAME) }}" == 'true'
         run: |
           array=${{ env.IMAGES_TO_BUILD }}
           for item in ${array[*]}
           do
             if [[ "$item" == ${{ vars.FRONTEND_IMAGE_NAME }} ]]; then
-              echo "Found Juice"
               echo ${{ env.IMAGES_TO_BUILD }}
               echo "Building frontend image"
               docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
@@ -125,15 +123,17 @@ jobs:
             fi
           done
 
-
       - name: Build and push backend image to ECR
-        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.BACKEND_IMAGE_NAME }})
         run: |
-          echo "Building backend image"
-          docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
-          docker tag ${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
-          echo "Pushing backend image to ECR"
-          docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
-
-
-      
+          array=${{ env.IMAGES_TO_BUILD }}
+          for item in ${array[*]}
+          do
+            if [[ "$item" == ${{ vars.BACKEND_IMAGE_NAME }} ]]; then
+              echo ${{ env.IMAGES_TO_BUILD }}
+              echo "Building backend image"
+              docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
+              docker tag ${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
+              echo "Pushing backend image to ECR"
+              docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:$IMAGE_TAG
+            fi
+          done
