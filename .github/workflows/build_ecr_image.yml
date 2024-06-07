@@ -100,27 +100,21 @@ jobs:
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
       
-      - name: test
-        run: |
-          echo "${{ env.IMAGES_TO_BUILD }}"
-          echo "${{ vars.FRONTEND_IMAGE_NAME }}"
-          echo "${{ fromJson(env.IMAGES_TO_BUILD) }}"
-          echo "${{ contains(fromJson(env.IMAGES_TO_BUILD), vars.FRONTEND_IMAGE_NAME) }}"
-
-      
       - name: Build and push frontend image to ECR
         run: |
-          array=${{ env.IMAGES_TO_BUILD }}
-          for item in ${array[*]}
-          do
-            echo item
-            if [[ "$item" == ${{ vars.FRONTEND_IMAGE_NAME }} ]]; then
-              echo ${{ env.IMAGES_TO_BUILD }}
-              echo "Building frontend image"
+          images=${{ env.IMAGES_TO_BUILD }}
+          images=${images//[\[\]\" ]/}
+          IFS=',' read -r -a image_array <<< "$images"
+
+          for image in "${image_array[@]}"; do
+            if [ "$image" == "${{ vars.FRONTEND_IMAGE_NAME }}" ]; then
+              echo "Building frontend image.."
               docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
               docker tag ${{ vars.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-              echo "Pushing frontend image to ECR"
+              echo "Pushing frontend image to ECR..."
               docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            else
+              echo "No frontend image to build..."
             fi
           done
 
@@ -132,14 +126,12 @@ jobs:
 
           for image in "${image_array[@]}"; do
             if [ "$image" == "${{ vars.BACKEND_IMAGE_NAME }}" ]; then
-              echo "should build backend image"
-              echo ${{ env.IMAGES_TO_BUILD }}
-              echo "Building backend image"
+              echo "Building backend image..."
               docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
               docker tag ${{ vars.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-              echo "Pushing backend image to ECR"
+              echo "Pushing backend image to ECR..."
               docker push ${{ env.ECR_ENDPOINT }}/${{ vars.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
             else
-              echo "No backend image to build"
+              echo "No backend image to build..."
             fi
           done
