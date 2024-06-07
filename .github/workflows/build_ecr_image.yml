@@ -107,6 +107,7 @@ jobs:
           IFS=',' read -r -a image_array <<< "$images"
 
           for image in "${image_array[@]}"; do
+            image=$(echo $image | xargs)
             if [ "$image" == "${{ vars.FRONTEND_IMAGE_NAME }}" ]; then
               echo "Building frontend image.."
               docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
@@ -125,6 +126,7 @@ jobs:
           IFS=',' read -r -a image_array <<< "$images"
 
           for image in "${image_array[@]}"; do
+            image=$(echo $image | xargs)
             if [ "$image" == "${{ vars.BACKEND_IMAGE_NAME }}" ]; then
               echo "Building backend image..."
               docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
