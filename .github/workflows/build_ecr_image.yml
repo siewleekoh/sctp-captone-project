@@ -86,7 +86,7 @@ jobs:
     needs: check_for_image_to_build
     strategy:
       matrix:
-        image: ${{ fromJson( needs.get_manually.outputs.IMAGES_TO_BUILD ) }} 
+        image: ${{ fromJson( needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD ) }} 
     steps:
       - name: Print image name from matrix
         run: |
