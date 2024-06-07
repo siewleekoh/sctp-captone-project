@@ -11,8 +11,8 @@ on:
           required: false
   push:
     paths:
-      - '../backend/**'
-      - '../frontend/**'
+      - './backend/**'
+      - './frontend/**'
 
 env:
   ECR_ENDPOINT: public.ecr.aws/u2q1a2y8
