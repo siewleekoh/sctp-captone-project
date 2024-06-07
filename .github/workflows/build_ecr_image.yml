@@ -122,11 +122,12 @@ jobs:
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
 
       - name: Build and push frontend image to ECR
-        if: contains(env.IMAGES_TO_BUILD, ${{ vars.FRONTEND_IMAGE_NAME }})
+        if: contains(env.IMAGES_TO_BUILD, "${{ vars.FRONTEND_IMAGE_NAME }}")
         env:
           IMAGE_TAG: latest
         run: |
-          echo contains(env.IMAGES_TO_BUILD, ${{ vars.FRONTEND_IMAGE_NAME }})
+          echo env.IMAGES_TO_BUILD
+          echo contains(env.IMAGES_TO_BUILD, "${{ vars.FRONTEND_IMAGE_NAME }}")
           echo "Building frontend image"
           docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} ./frontend
           echo "Pushing frontend image to ECR"
