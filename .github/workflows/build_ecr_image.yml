@@ -80,22 +80,22 @@ jobs:
           echo "IMAGES_TO_BUILD=${IMAGES_TO_BUILD}" >> $GITHUB_OUTPUT
 
 
-  print_image_names_with_matrix:
-    name: "Build image: ${{ matrix.image }}"
-    runs-on: ubuntu-latest
-    needs: check_for_image_to_build
-    strategy:
-      matrix:
-        image: ${{ fromJson( needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD ) }} 
-    steps:
-      - name: Print image name from matrix
-        run: |
-          echo "${{ matrix.image }}"
+  # print_image_names_with_matrix:
+  #   name: "Build image: ${{ matrix.image }}"
+  #   runs-on: ubuntu-latest
+  #   needs: check_for_image_to_build
+  #   strategy:
+  #     matrix:
+  #       image: ${{ fromJson( needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD ) }} 
+  #   steps:
+  #     - name: Print image name from matrix
+  #       run: |
+  #         echo "${{ matrix.image }}"
 
 
   build-and-push-image:
     runs-on: ubuntu-latest
-    needs: [check_for_image_to_build, print_image_names_with_matrix]
+    needs: [check_for_image_to_build]
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
