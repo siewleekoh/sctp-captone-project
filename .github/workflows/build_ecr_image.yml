@@ -124,11 +124,6 @@ jobs:
       - name: Login to AWS ECR
         id: login-ecr
         run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
-
-      # - name: Conditionally Run
-      #   if:   contains(env.IMAGES_TO_BUILD, 'SomeString')
-      #   run:  echo "SomeString did exist and should run"
-
       
       - name: test
         run: |
@@ -139,7 +134,7 @@ jobs:
 
       
       - name: Build and push frontend image to ECR
-        if: contains(fromJson('env.IMAGES_TO_BUILD'), '${{ vars.FRONTEND_IMAGE_NAME }}')
+        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.FRONTEND_IMAGE_NAME }})
         run: |
           echo ${{ env.IMAGES_TO_BUILD }}
           echo "Building frontend image"
@@ -169,8 +164,6 @@ jobs:
 
       - name: Build and push backend image to ECR
         if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.BACKEND_IMAGE_NAME }})
-        env:
-          IMAGE_TAG: latest
         run: |
           echo "Building backend image"
           docker build -t ${{ vars.BACKEND_IMAGE_NAME }} ./backend
@@ -180,28 +173,3 @@ jobs:
 
 
       
-      
-      
-
-#
-#      - name: Frontend docker build and tag
-#        run: |
-#          docker build -t ${{ vars.FRONTEND_IMAGE_NAME }} .
-#          docker tag ${{ vars.IMAGE_NAME }}:latest ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
-     # - name: Run frontend image scan
-     #   uses: aquasecurity/trivy-action@master
-     #   with:
-     #     image-ref: '${{ vars.FRONTEND_IMAGE_NAME }}:latest'
-     #     format: 'table'
-     #     # exit-code: '1'
-     #     ignore-unfixed: true
-     #     vuln-type: 'os,library'
-     #     severity: 'MEDIUM,HIGH,CRITICAL'
-     #     output: 'frontend-docker-image-scan.json'
-     # - name: Upload Docker Trivy Report
-     #   uses: actions/upload-artifact@v4.3.0
-     #   with:
-     #     name: docker-image-scan
-     #     path: docker-image-scan.json
-     # - name: Docker publish to ECR
-     #   run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.FRONTEND_IMAGE_NAME }}:latest
