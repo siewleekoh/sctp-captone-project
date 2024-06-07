@@ -134,7 +134,7 @@ jobs:
 
       
       - name: Build and push frontend image to ECR
-        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.FRONTEND_IMAGE_NAME }})
+        if: contains(fromJson(env.IMAGES_TO_BUILD), ${{ vars.FRONTEND_IMAGE_NAME }}) == 'true'
         run: |
           echo ${{ env.IMAGES_TO_BUILD }}
           echo "Building frontend image"
