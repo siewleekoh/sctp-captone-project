@@ -42,11 +42,19 @@ Landing Page            |  Menu Page
 
 ## Deploying Grafana for AWS Cloudwatch Monitoring
 
-1. Install grafana using helm: ```helm upgrade grafana grafana/grafana \                     
-    --namespace monitoring \
-    --set service.type=LoadBalancer```
+1. Create a namespace: ```kubectl create ns monitoring```
 
-2. Get your Grafana ELB URL using the below command. Update records in Route53 if required.
+2. Install and upgrade grafana using helm.
+        <details>
+        <summary open>
+        Code Snippet
+        </summary>
+
+        helm install grafana grafana/grafana -n monitoring
+        helm upgrade grafana grafana/grafana --namespace monitoring --set service.type=LoadBalancer
+
+
+1. Get your Grafana ELB URL using the below command. Update records in Route53 if required.
         <details>
         <summary open>
         Code Snippet
