@@ -41,10 +41,27 @@ Landing Page            |  Menu Page
 4. Check AWS to ensure logs are flowing into cloudwatch.
 
 ## Deploying Grafana for AWS Cloudwatch Monitoring
-1. Create a namespace: ```kubectl create ns monitoring```
 
-2. Install grafana using helm: ```helm install grafana grafana/grafana -n monitoring```
+1. Install grafana using helm: ```helm upgrade grafana grafana/grafana \                     
+    --namespace monitoring \
+    --set service.type=LoadBalancer```
 
-3. Port forward application to monitor locally: ```kubectl port-forward svc/grafana 3000:80 -n monitoring```
+2. Get your Grafana ELB URL using the below command. Update records in Route53 if required.
+        <details>
+        <summary open>
+        Code Snippet
+        </summary>
+        ```
+        export ELB=$(kubectl get svc -n grafana grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        ```
+        ```
+        echo "http://$ELB"
+        ```
+        </details>
+
+
+
+# Challenges and Way Forward
 
 # References
+- https://archive.eksworkshop.com/intermediate/240_monitoring/deploy-grafana/
