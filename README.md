@@ -51,13 +51,11 @@ Landing Page            |  Menu Page
         <summary open>
         Code Snippet
         </summary>
-        ```
+
         export ELB=$(kubectl get svc -n grafana grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-        ```
-        ```
         echo "http://$ELB"
-        ```
-        </details>
+
+        
 
 
 
