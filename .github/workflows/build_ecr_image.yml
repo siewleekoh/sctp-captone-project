@@ -133,7 +133,7 @@ jobs:
           build_frontend=${{ env.RUN_FRONTEND_BUILD }}
           echo "build_frontend is: $build_frontend"
           echo "Building frontend image.."
-          docker build -t ${{ env.FRONTEND_IMAGE_NAME }} ./frontend
+          docker build --no-cache -t ${{ env.FRONTEND_IMAGE_NAME }} ./frontend
           docker tag ${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           echo "Pushing frontend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
@@ -145,7 +145,7 @@ jobs:
           build_backend=${{ env.RUN_BACKEND_BUILD }}
           echo "build_backend is: $build_backend"
           echo "Building backend image..."
-          docker build -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
+          docker build --no-cache -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
           docker tag ${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           echo "Pushing backend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
@@ -179,7 +179,7 @@ jobs:
           build_frontend=${{ env.RUN_FRONTEND_DEPLOY }}
           echo "eks build_frontend is: $build_frontend"
           echo "Deploying frontend to EKS..."
-          kubectl apply -f deployment/kubernetes/frontend.yaml
+          kubectl rollout restart deployment restaurant-app -n=restaurant 
 
       - name: Deploy backend to EKS
         if: env.RUN_BACKEND_DEPLOY == 'true'
@@ -187,4 +187,4 @@ jobs:
           build_backend=${{ env.RUN_BACKEND_DEPLOY }}
           echo "eks build_backend is: $build_backend"
           echo "Deploying backend to EKS..."
-          kubectl apply -f deployment/kubernetes/backend.yaml
+          kubectl rollout restart deployment restaurant-api -n=restaurant 
