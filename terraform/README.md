@@ -41,6 +41,8 @@ terraform destroy -var-file="secrets.tfvars"
 ```
 
 - If encountering issue deleting resources, list resources and manually remove it in AWS console and run `terraform destroy` again
+- If encounter error when destroying EKS, `Error: Kubernetes cluster unreachable: invalid configuration: no configuration has been provided, try setting KUBERNETES_MASTER environment variable
+  `, run this to resolve it, `export KUBE_CONFIG_PATH=~/.kube/config`
 ```
 terraform state list
 terraform destroy -var-file="secrets.tfvars"

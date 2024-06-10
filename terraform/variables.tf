@@ -47,7 +47,7 @@ variable "mysql_password" {
 variable "eks_cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "ce5-group2-eks-terraform"
+  default     = "ce5-group2-eks-cluster"
 }
 
 variable "user1_name" {

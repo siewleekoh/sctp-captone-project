@@ -7,7 +7,6 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
 
-
 // create the connection to database
 const db = mysql.createConnection({
     host: process.env.MYSQL_HOST,
@@ -15,7 +14,6 @@ const db = mysql.createConnection({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE
 });
-
 
 db.connect(error => {
   if (error) throw error;

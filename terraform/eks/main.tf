@@ -2,10 +2,10 @@
 locals {
   cluster_name          = var.eks_cluster_name
   node_group_name       = "ce5-group2-node-group"
-  instance_types        = ["t2.micro"]
-  instance_min_size     = 10
-  instance_max_size     = 15
-  instance_desired_size = 10
+  instance_types        = ["t3.medium"]
+  instance_min_size     = 3
+  instance_max_size     = 5
+  instance_desired_size = 3
 }
 
 module "eks" {
