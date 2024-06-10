@@ -181,7 +181,7 @@ jobs:
           echo "Deploying frontend to EKS..."
           kubectl apply -f deployment/kubernetes/frontend.yaml
 
-      - name: Deploy frontend to EKS
+      - name: Deploy backend to EKS
         if: env.RUN_BACKEND_DEPLOY == 'true'
         run: |
           build_backend=${{ env.RUN_BACKEND_DEPLOY }}
