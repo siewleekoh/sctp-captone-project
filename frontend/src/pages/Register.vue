@@ -181,7 +181,7 @@ export default {
             }
             else {
                 if (!this.registerObj.phone.startsWith('65')) {
-                    this.errorObj.phoneErr.push('Phone numbers must start with 84');
+                    this.errorObj.phoneErr.push('Phone numbers must start with 65');
                 }
 
                 if (this.registerObj.phone.length != 10) {
