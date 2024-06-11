@@ -22,7 +22,7 @@ docker-compose up
 1. Log in to the cluster
 
 ```
-aws eks update-kubeconfig --name ce5-group2-eks-terraform --region us-east-1
+aws eks update-kubeconfig --name ce5-group2-eks-cluster --region us-east-1
 ```
 
 2. Get LB url and update in Route53
