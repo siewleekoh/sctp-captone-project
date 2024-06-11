@@ -1,5 +1,5 @@
 // import connection
-import db from "../config/database.js";
+import db from "../utils/database.js";
 
 // get all Foods
 export const getFoods = (result) => {

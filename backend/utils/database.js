@@ -1,11 +1,11 @@
 import mysql from "mysql2";
+import logger from './logger.js';
 
 // manage environment variables
 import * as dotenv from "dotenv";
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config();
 }
-
 
 // create the connection to database
 const db = mysql.createConnection({
@@ -15,10 +15,10 @@ const db = mysql.createConnection({
     database: process.env.MYSQL_DATABASE
 });
 
-
 db.connect(error => {
   if (error) throw error;
   console.log("Successfully connected to the database.");
+  logger.info("Successfully connected to the database.");
 });
 
 export default db;

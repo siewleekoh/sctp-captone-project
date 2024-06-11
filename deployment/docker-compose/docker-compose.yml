@@ -7,8 +7,7 @@ services:
   backend:
     container_name: webserver
     build:
-      context: ./backend
-      dockerfile: ./Dockerfile
+      context: ../../backend
     ports:
       - "8888:8888"
     restart: on-failure
@@ -18,10 +17,13 @@ services:
   frontend:
     container_name: website
     build:
-      context: ./frontend/
-      dockerfile: ./Dockerfile
+      context: ../../frontend
+    environment:
+      - HUB_HOST=webserver
+      - HUB_PORT=8888
+      - VUE_APP_ROOT_API=http://localhost:8888/api/v1
     ports:
-      - "7777:8080"
+      - "7778:80"
     restart: on-failure
     networks:
       - restaurant-network

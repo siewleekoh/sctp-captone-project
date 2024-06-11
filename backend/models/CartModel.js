@@ -1,5 +1,5 @@
 // import connection
-import db from "../config/database.js";
+import db from "../utils/database.js";
 
 // get all items by user id
 export const getAllItems = (id,result) => {

@@ -41,8 +41,8 @@ app.use(router);
 //   app.get(/.*/, (req,res)=> res.sendFile(__dirname + '/public/index.html'));
 // }
 
-app.get('/', function(req, res){
-    res.json({ message: 'Welcome to restaurant api' });
+app.get('/api', function(req, res){
+    res.json({ message: 'Welcome to the restaurant api!' });
 });
 
 // PORT
