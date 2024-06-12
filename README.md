@@ -43,7 +43,62 @@ Landing Page            |  Menu Page
 ![](docs/images/landing_page.png)  |  ![](docs/images/menu.png)
 
 # Implementation Details
-## 1) App Deployment - frontend and backend
+
+## 1) Provisioning of AWS Infrastructure - Terraform Deployment
+
+- To set up your local environment, copy and rename `secrets.tfvars.example` to `secrets.tfvars` with updated aws secrets.
+  `secrets.tfvars` is in `.gitignore` and will not be committed.
+
+- Running terraform
+    1. To start terraform
+
+    ```
+    terraform init
+    ```
+
+    2. To format terraform files
+
+    ```
+    terraform fmt -recursive 
+    ```
+
+    3. To validate terraform files
+    ```
+    terraform validate
+    ```
+
+    4. To check resources that are going to be created and for any errors
+
+    ```
+    terraform plan -var-file="secrets.tfvars"
+    ```
+
+    5. To apply the changes
+
+    ```
+    terraform apply -var-file="secrets.tfvars"
+    ```
+
+    6. To destroy the resources created
+
+    ```
+    terraform destroy -var-file="secrets.tfvars"
+    ```
+
+    7. If encountering issue deleting resources, list resources and manually remove it in AWS console and run `terraform destroy` again.
+       If encounter error when destroying EKS, `Error: Kubernetes cluster unreachable: invalid configuration: no configuration has been provided`, try setting KUBERNETES_MASTER environment variable, run this to resolve it, `export KUBE_CONFIG_PATH=~/.kube/config`
+    ```
+    terraform state list
+    terraform destroy -var-file="secrets.tfvars"
+    ```
+
+    8. To access the EKS cluster, change EKS context for `kubectl` to the newly created cluster
+
+    ```
+    aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw eks_cluster_name)
+    ```
+
+## 2) App Deployment - frontend and backend
 - The frontend is a Vue application and the backend is a Express.js application. Both have been dockerized and can be deployed in a kubernetes cluster.
 - To set up environmental variables in your local environment, rename `backend/.env.example` to `backend/.env` and 
 `frontend/.env.example` to `backend/.env` with updated variables.
@@ -87,62 +142,6 @@ Landing Page            |  Menu Page
 
   8. Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
 
-## 2) Provisioning of AWS Infrastructure - Terraform Deployment
-
-- To set up your local environment, copy and rename `secrets.tfvars.example` to `secrets.tfvars` with updated aws secrets.
-`secrets.tfvars` is in `.gitignore` and will not be committed.
-
-- Running terraform
-  1. To start terraform
-
-    ```
-    terraform init
-    ```
-
-  2. To format terraform files
-
-    ```
-    terraform fmt -recursive 
-    ```
-
-  3. To validate terraform files
-    ```
-    terraform validate
-    ```
-
-  4. To check resources that are going to be created and for any errors
-
-    ```
-    terraform plan -var-file="secrets.tfvars"
-    ```
-
-  5. To apply the changes
-
-    ```
-    terraform apply -var-file="secrets.tfvars"
-    ```
-
-  6. To destroy the resources created
-
-    ```
-    terraform destroy -var-file="secrets.tfvars"
-    ```
-
-  7. If encountering issue deleting resources, list resources and manually remove it in AWS console and run `terraform destroy` again. 
-  If encounter error when destroying EKS, `Error: Kubernetes cluster unreachable: invalid configuration: no configuration has been provided`, try setting KUBERNETES_MASTER environment variable, run this to resolve it, `export KUBE_CONFIG_PATH=~/.kube/config`
-    ```
-    terraform state list
-    terraform destroy -var-file="secrets.tfvars"
-    ```
-
-  8. To access the EKS cluster, change EKS context for `kubectl` to the newly created cluster
-
-    ```
-    aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw eks_cluster_name)
-    ```
-
-
-
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 
 1. namespace `amazon-cloudwatch` has already been created in terraform
@@ -173,8 +172,28 @@ Landing Page            |  Menu Page
         export ELB=$(kubectl get svc -n monitoring grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
         echo "http://$ELB"
 
+## 5) MySQL - Accessing RDS MySQL Database in private subnet via Bastion Host
+- A EC2 bastion host has been created in the public subnet of the VPC with a `.pem` key and security group that allows SSH access from the user's IP.
+- To connect to the RDS instance
+  1) Add ssh key to ssh client
+    ```
+    ssh-add ce5-group2-bastion.pem
+    ```
+  2) SSH to the bastion host
+    ```
+    ssh -i "ce5-group2-bastion.pem" ec2-user@ec2-52-91-94-235.compute-1.amazonaws.com
+    ```
 
-## 5) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
+  3) Installation of mysql client on the EC2
+    ```
+    sudo yum install -y https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    sudo yum install -y mysql-community-client
+    # Run the following line if you get a GPG error and then run the previous line again
+    sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+    mysql -u admin -p`8k-G1^-k` -h ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com -P 3306
+    ```
+
+## 6) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
 - The `build_deploy_image.yml` pipeline is triggered when a push is made to any branches at the `frontend`/`backend` folder.
 - The pipeline builds the docker image, tags it with the `latest` tag and pushes it to ECR.
 - The pipeline then updates the deployment files with the new image tag and deploys the image to EKS.
