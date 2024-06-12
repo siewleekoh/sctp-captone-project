@@ -191,6 +191,9 @@ Landing Page            |  Menu Page
     sudo yum install -y mysql-community-client
     # Run the following line if you get a GPG error and then run the previous line again
     sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+    ```
+  4) To access the database, use the following command
+    ```
     mysql -u <username> -p <password> -h ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com -P 3306
     ```
 
@@ -218,6 +221,7 @@ Landing Page            |  Menu Page
 2) Implement more stringent security measures like using IAM roles for github actions, grafana dashboard access, and EKS cluster access.
 3) Implement robust authentication (e.g., OAuth2, JWT) and authorization (role-based access control) mechanisms for the backend API calls.
 4) Store sensitive information (API keys, database credentials) securely using AWS Secrets Manager or AWS Systems Manager Parameter Store.
+5) Automate the migrations for MySQL for any schema changes.
 
 
 # References
