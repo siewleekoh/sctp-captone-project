@@ -1,6 +1,7 @@
-# SCTP Capstone Project - Cohort 5 Group 2
-- This repo documents the capstone project as part of a course requirement for the NTU SCTP Cloud Infrastucture Engineering program.
-  The repo follows a gitflow branching strategy with main (stores official release history), develop (integrates features), feature and bugfix branches.
+# SCTP CE Capstone Project - Cohort 5 Group 2
+- This repo documents the capstone project as part of a course requirement for the NTU SCTP Cloud Infrastructure Engineering program.
+- The repo follows a gitflow branching strategy with main (stores official release history), develop (integrates features), feature and bugfix branches.
+- The repo has a `dev` environment for CI/CD testing.
 - Team members:   
       1. Jonathan Chin  
       2. Chin Lee Fong  
@@ -144,15 +145,15 @@ Landing Page            |  Menu Page
 
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 
-1. Create a namespace: ```kubectl create ns amazon-cloudwatch```
+1. namespace `amazon-cloudwatch` has already been created in terraform
 
-2. Create fluentd configmap: ```kubectl apply -f ./monitoring-logging/0-configmap.yaml```
+2. Create fluentd configmap: ```kubectl apply -f ./monitoring-logging/0-configmap.yaml -n=amazon-cloudwatch```
 
-3. Apply fluentd monitoring:```kubectl apply -f ./monitoring-logging/1-fluentd-logging.yaml```
+3. Apply fluentd monitoring:```kubectl apply -f ./monitoring-logging/1-fluentd-logging.yaml -n=amazon-cloudwatch```
 
 4. Check AWS to ensure logs are flowing into cloudwatch.
 
-## 3) Dashboard - Deploying Grafana for AWS Cloudwatch Monitoring
+## 4) Dashboard - Deploying Grafana for AWS Cloudwatch Monitoring
 
 1. Install grafana using helm.
         <details>
