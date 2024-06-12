@@ -190,7 +190,7 @@ Landing Page            |  Menu Page
     sudo yum install -y mysql-community-client
     # Run the following line if you get a GPG error and then run the previous line again
     sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-    mysql -u admin -p`8k-G1^-k` -h ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com -P 3306
+    mysql -u <username> -p <password> -h ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com -P 3306
     ```
 
 ## 6) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
