@@ -20,6 +20,15 @@ env:
   BACKEND_IMAGE_NAME: ce5-group2-backend
   FRONTEND_IMAGE_NAME: ce5_group2_frontend
   EKS_CLUSTER_NAME: ce5-group2-eks-cluster
+  VUE_APP_ROOT_API: http://ce5-group2-food.sctp-sandbox.com/api/v1
+  VUE_APP_ALLOWED_HOST: .sctp-sandbox.com
+  NODE_ENV: development
+  MYSQL_HOST: ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com
+  MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+  MYSQL_DATABASE: db_restaurant
+  MYSQL_PORT: 3306
+  BACKEND_PORT: 8888
 
 jobs:
   check_for_image_to_build:
@@ -112,15 +121,6 @@ jobs:
       IMAGES_TO_BUILD:  ${{ needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD }}
       RUN_FRONTEND_BUILD:  ${{ needs.check_for_image_to_build.outputs.BUILD_FRONTEND }}
       RUN_BACKEND_BUILD:  ${{ needs.check_for_image_to_build.outputs.BUILD_BACKEND }}
-      VUE_APP_ROOT_API: http://ce5-group2-food.sctp-sandbox.com/api/v1
-      VUE_APP_ALLOWED_HOST: .sctp-sandbox.com
-      NODE_ENV: development
-      MYSQL_HOST: ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com
-      MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
-      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-      MYSQL_DATABASE: db_restaurant
-      MYSQL_PORT: 3306
-      BACKEND_PORT: 8888
     if: needs.check_for_image_to_build.outputs.IMAGES_TO_BUILD != '[]'
     steps:
       - name: Checkout
@@ -166,7 +166,7 @@ jobs:
     env:
       RUN_FRONTEND_DEPLOY: ${{ needs.check_for_image_to_build.outputs.BUILD_FRONTEND }}
       RUN_BACKEND_DEPLOY: ${{ needs.check_for_image_to_build.outputs.BUILD_BACKEND }}
-    if: needs.build-and-push-image.outputs.IMAGES_TO_BUILD != '[]'
+    if: needs.build_and_push_image.outputs.IMAGES_TO_BUILD != '[]'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
