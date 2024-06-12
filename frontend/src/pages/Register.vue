@@ -135,8 +135,8 @@ export default {
                 this.errorObj.nameErr.push("Entering a name is required");
             }
             else {
-                if (!/^[A-Za-z]+$/.test(this.registerObj.name.replace(/\s/g, ""))) {
-                    this.errorObj.nameErr.push('A name can only contain letters');
+                if (!/^[A-Za-z0-9_]+$/.test(this.registerObj.name.replace(/\s/g, ""))) {
+                    this.errorObj.nameErr.push('A name can only contain letters, numbers and underscore');
                 }
             }
 
