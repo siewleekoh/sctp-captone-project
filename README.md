@@ -173,15 +173,31 @@ Landing Page            |  Menu Page
         export ELB=$(kubectl get svc -n monitoring grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
         echo "http://$ELB"
 
-        
 
+## 5) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
+- The `build_deploy_image.yml` pipeline is triggered when a push is made to any branches at the `frontend`/`backend` folder.
+- The pipeline builds the docker image, tags it with the `latest` tag and pushes it to ECR.
+- The pipeline then updates the deployment files with the new image tag and deploys the image to EKS.
 
 
 # Challenges 
+1) Complexity of Kubernetes deployment
+- Kubernetes itself is a complex container orchestration system and thus has a Steep Learning Curve. 
+  Understanding its architecture, components (like pods, services, deployments, namespaces), and operational principles 
+  requires a significant amount of study and practice.
+2) Productionizing the frontend and backend application
+- The frontend and backend application were not production-ready and required additional configuration and setup to be deployed in a kubernetes cluster.
+  In addition, the application required additional environment variables to be set up for the application to work correctly.
+3) AWS-Specific Implementations
+-  EKS integrates with other AWS services like IAM for authentication, ELB for load balancing, and CloudWatch for logging and monitoring.
+   Understanding how these services interconnect adds another layer of complexity
 
 
 # Moving Forward 
-- Integrating Github actions to build and push images to ECR when building image files
+1) Adding unit/integration tests for the frontend and backend application as part of the CI/CD pipeline.
+2) Implement more stringent security measures like using IAM roles for github actions, grafana dashboard access, and EKS cluster access.
+3) Implement robust authentication (e.g., OAuth2, JWT) and authorization (role-based access control) mechanisms for the backend API calls.
+4) Store sensitive information (API keys, database credentials) securely using AWS Secrets Manager or AWS Systems Manager Parameter Store.
 
 
 # References
