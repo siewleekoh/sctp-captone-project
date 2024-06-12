@@ -13,7 +13,9 @@ So let's get things cooking! 🍳
 - Logging: Fluentd 
 
 ## Architecture Diagram 
-insert diagram here
+![image](https://github.com/StrawberriCake/restaurant-ordering-system/assets/153524202/c6a8c08e-27f3-4a9d-8ac1-c1bd839bf0f7)
+
+
 
 # Let's start ordering! 🍽️
 
