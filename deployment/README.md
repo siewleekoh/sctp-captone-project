@@ -56,4 +56,4 @@ kubectl get pods -n=restaurant
 kubectl logs <pod-name> -n=restaurant 
 ```
 
-8Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
+8. Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
