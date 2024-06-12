@@ -1,3 +1,4 @@
+[![Build and push frontend/backend image to ECR and deploy to EKS](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_ecr_image.yml/badge.svg?branch=main)](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_ecr_image.yml)
 # SCTP CE Capstone Project - Cohort 5 Group 2
 - This repo documents the capstone project as part of a course requirement for the NTU SCTP Cloud Infrastructure Engineering program.
 - The repo follows a gitflow branching strategy with main (stores official release history), develop (integrates features), feature and bugfix branches.
