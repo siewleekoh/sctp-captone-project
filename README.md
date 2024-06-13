@@ -122,7 +122,16 @@ Landing Page            |  Menu Page
     kubectl config set-context --current --namespace=restaurant
     ```
   
-  5. Build frontend and backend container docker images and push to ECR if necessary. Update the image url in the deployment files.
+  5. Build frontend and backend container docker images using the environment variables in `.env' file and push to ECR if not using the CICD pipeline. 
+     Update the docker image url in the deployment files.
+  
+    ```
+    cd frontend
+    docker build --no-cache $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="") .
+  
+    cd backend
+    docker build --no-cache -t ce5-group2-backend  $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="") .
+    ```
 
   6. Deploy the frontend, backend and ingress
 
