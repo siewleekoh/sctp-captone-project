@@ -224,6 +224,7 @@ Landing Page            |  Menu Page
     ```
 
 ## 6) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
+![](docs/images/cicd_build_deploy_ecr.png)
 - The `build_deploy_image.yml` pipeline is triggered when a push is made to any branches at the `frontend`/`backend` folder.
 - The pipeline builds the docker image, tags it with the `latest` tag and pushes it to ECR.
 - The pipeline then updates the deployment files with the new image tag and deploys the image to EKS.
