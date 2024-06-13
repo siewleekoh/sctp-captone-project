@@ -3,9 +3,12 @@ import logger from './logger.js';
 
 // manage environment variables
 import * as dotenv from "dotenv";
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+dotenv.config();
+//if (process.env.NODE_ENV !== 'production') {
+//  dotenv.config();
+//}
+
+logger.info(`Database URL: ${process.env.MYSQL_HOST}...`);
 
 // create the connection to database
 const db = mysql.createConnection({
@@ -14,6 +17,8 @@ const db = mysql.createConnection({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE
 });
+
+logger.info(`Connecting to Database at URL: ${process.env.MYSQL_HOST}...`);
 
 db.connect(error => {
   if (error) throw error;

@@ -20,9 +20,9 @@ env:
   BACKEND_IMAGE_NAME: ce5-group2-backend
   FRONTEND_IMAGE_NAME: ce5_group2_frontend
   EKS_CLUSTER_NAME: ce5-group2-eks-cluster
-  VUE_APP_ROOT_API: http://ce5-group2-food.sctp-sandbox.com/api/v1
+  VUE_APP_ROOT_API: https://ce5-group2-food.sctp-sandbox.com/api/v1
   VUE_APP_ALLOWED_HOST: .sctp-sandbox.com
-  NODE_ENV: development
+  NODE_ENV: production
   MYSQL_HOST: ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com
   MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
   MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
@@ -142,19 +142,34 @@ jobs:
           build_frontend=${{ env.RUN_FRONTEND_BUILD }}
           echo "build_frontend is: $build_frontend"
           echo "Building frontend image.."
-          docker build --no-cache -t ${{ env.FRONTEND_IMAGE_NAME }} --build-arg VUE_APP_ROOT_API=${{ env.VUE_APP_ROOT_API }} --build-arg VUE_APP_ALLOWED_HOST=${{ env.VUE_APP_ALLOWED_HOST }} ./frontend
+          
+          docker build \
+          --build-arg VUE_APP_ROOT_API=${{ env.VUE_APP_ROOT_API }} \
+          --build-arg VUE_APP_ALLOWED_HOST=${{ env.VUE_APP_ALLOWED_HOST }} \
+          --no-cache -t ${{ env.FRONTEND_IMAGE_NAME }} ./frontend
+          
           docker tag ${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           echo "Pushing frontend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-
       - name: Build and push backend image to ECR
         if: env.RUN_BACKEND_BUILD == 'true'
         run: |
+          echo "backend mysql db url is: ${{ env.MYSQL_HOST }}"
           build_backend=${{ env.RUN_BACKEND_BUILD }}
           echo "build_backend is: $build_backend"
           echo "Building backend image..."
-          docker build --no-cache -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
+          
+          docker build \
+          --build-arg NODE_ENV=${{ env.NODE_ENV }} \
+          --build-arg MYSQL_HOST=${{ env.MYSQL_HOST }} \
+          --build-arg MYSQL_USERNAME=${{ env.MYSQL_USERNAME }} \
+          --build-arg MYSQL_PASSWORD=${{ env.MYSQL_PASSWORD }} \
+          --build-arg MYSQL_DATABASE=${{ env.MYSQL_DATABASE }} \
+          --build-arg MYSQL_PORT=${{ env.MYSQL_PORT }} \
+          --build-arg BACKEND_PORT=${{ env.BACKEND_PORT }} \
+          --no-cache -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
+          
           docker tag ${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           echo "Pushing backend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
