@@ -36,7 +36,8 @@ So let's get things cooking! 🍳
 ## Architecture Diagram 
 ![](docs/images/architecture_diagram.png)
 
-- EKS Cluster: located in a private subnet and is used to deploy the frontend and backend application, as well as the fluentd logging agent.
+- EKS Cluster: located in a private subnet and is used to deploy the frontend and backend application, TLS certificate manager,
+  as well as the fluentd logging agent.
 - RDS: located in a private subnet and used to store the application data like user details, menu items and orders.
 - Route53: used to route traffic to the EKS cluster.
 - Cloudwatch:  used to monitor the EKS cluster and the RDS instance.
