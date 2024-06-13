@@ -3,10 +3,12 @@ import logger from './logger.js';
 
 // manage environment variables
 import * as dotenv from "dotenv";
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
-
+dotenv.config();
+//if (process.env.NODE_ENV !== 'production') {
+//  dotenv.config();
+//}
+logger.info(`Database URL: ${process.env.MYSQL_HOST}...`);
+logger.info(` MYSQL_DATABASE at URL: ${process.env.MYSQL_DATABASE}...`);
 // create the connection to database
 const db = mysql.createConnection({
     host: process.env.MYSQL_HOST,
