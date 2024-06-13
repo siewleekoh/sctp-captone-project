@@ -151,6 +151,7 @@ jobs:
       - name: Build and push backend image to ECR
         if: env.RUN_BACKEND_BUILD == 'true'
         run: |
+          echo "backend mysql db url is: ${{ env.MYSQL_HOST }}"
           build_backend=${{ env.RUN_BACKEND_BUILD }}
           echo "build_backend is: $build_backend"
           echo "Building backend image..."

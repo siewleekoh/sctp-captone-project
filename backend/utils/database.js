@@ -15,6 +15,8 @@ const db = mysql.createConnection({
     database: process.env.MYSQL_DATABASE
 });
 
+logger.info(`Connecting to Database at URL: ${process.env.MYSQL_HOST}...`);
+
 db.connect(error => {
   if (error) throw error;
   console.log("Successfully connected to the database.");
