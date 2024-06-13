@@ -159,8 +159,18 @@ Landing Page            |  Menu Page
     kubectl get pods -n=restaurant
     kubectl logs <pod-name> -n=restaurant 
     ```
+  8. Add TLS certificate to the EKS cluster
+    ```
+    helm repo add jetstack https://charts.jetstack.io && helm repo update
+    helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.10.0 --set installCRDs=true
+    kubectl apply -f certificate_issuer.yaml -n=restaurant
+    kubectl  describe issuer letsencrypt -n=restaurant
+   ```
 
-  8. Access the restaurant order page at http://ce5-group2-food.sctp-sandbox.com/
+  8. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
+
+## 3) Adding TLS certificate to the Ingress
+
 
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 

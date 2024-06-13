@@ -20,7 +20,7 @@ env:
   BACKEND_IMAGE_NAME: ce5-group2-backend
   FRONTEND_IMAGE_NAME: ce5_group2_frontend
   EKS_CLUSTER_NAME: ce5-group2-eks-cluster
-  VUE_APP_ROOT_API: http://ce5-group2-food.sctp-sandbox.com/api/v1
+  VUE_APP_ROOT_API: https://ce5-group2-food.sctp-sandbox.com/api/v1
   VUE_APP_ALLOWED_HOST: .sctp-sandbox.com
   NODE_ENV: production
   MYSQL_HOST: ce5-group2-restaurant.chheppac9ozc.us-east-1.rds.amazonaws.com
