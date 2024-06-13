@@ -136,6 +136,21 @@ jobs:
         id: login-ecr
         run: aws ecr-public get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_ENDPOINT }}
 
+      - name: generate env variables
+        run: |
+          touch .env
+          {
+            echo "VUE_APP_ROOT_API=${{ env.VUE_APP_ROOT_API }}"
+            echo "VUE_APP_ALLOWED_HOST=${{ env.VUE_APP_ALLOWED_HOST }}"
+            echo "NODE_ENV=${{ env.NODE_ENV }}"
+            echo "MYSQL_HOST=${{ env.MYSQL_HOST }}"
+            echo "MYSQL_USERNAME=${{ env.MYSQL_USERNAME }}"
+            echo "MYSQL_PASSWORD=${{ env.MYSQL_PASSWORD }}"
+            echo "MYSQL_DATABASE=${{ env.MYSQL_DATABASE }}"
+            echo "MYSQL_PORT=${{ env.MYSQL_PORT }}"
+            echo "BACKEND_PORT=${{ env.BACKEND_PORT }}"
+          } >> .env
+
       - name: Build and push frontend image to ECR
         if: env.RUN_FRONTEND_BUILD == 'true'
         run: |

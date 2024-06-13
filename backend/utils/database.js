@@ -7,8 +7,9 @@ dotenv.config();
 //if (process.env.NODE_ENV !== 'production') {
 //  dotenv.config();
 //}
+
 logger.info(`Database URL: ${process.env.MYSQL_HOST}...`);
-logger.info(` MYSQL_DATABASE at URL: ${process.env.MYSQL_DATABASE}...`);
+
 // create the connection to database
 const db = mysql.createConnection({
     host: process.env.MYSQL_HOST,
