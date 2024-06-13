@@ -152,19 +152,6 @@ jobs:
           echo "Pushing frontend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-      - name: generate env variables
-        uses: paramt/github-actions-playground@master
-        env:
-            VUE_APP_ROOT_API: ${{ env.VUE_APP_ROOT_API }}
-            VUE_APP_ALLOWED_HOST: ${{ env.VUE_APP_ALLOWED_HOST }}
-            MYSQL_HOST: ${{ env.MYSQL_HOST }}
-            MYSQL_USERNAME: ${{ env.MYSQL_USERNAME }}
-            MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-            MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
-            MYSQL_PORT: ${{ env.MYSQL_PORT }}
-            BACKEND_PORT: ${{ env.BACKEND_PORT }}
-            NODE_ENV: ${{ env.NODE_ENV }}
-
       - name: Build and push backend image to ECR
         if: env.RUN_BACKEND_BUILD == 'true'
         run: |
