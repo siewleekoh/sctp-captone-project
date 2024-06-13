@@ -167,7 +167,7 @@ Landing Page            |  Menu Page
     kubectl  describe issuer letsencrypt -n=restaurant
    ```
 
-  8. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
+  9. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
 
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 
