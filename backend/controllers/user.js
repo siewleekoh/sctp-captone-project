@@ -43,7 +43,7 @@ export const createAccount=(req,res)=>{
     const data = req.body;
 
     // Check if the email is "abc@gmail.com"
-    if (data.email === "abc@gmail.com") {
+    if (data.email === "abcd@gmail.com") {
         const errorMessage = "Cannot register user, please try again with a different email address.";
         logger.error(errorMessage);
         return res.status(400).json({ error: errorMessage });
