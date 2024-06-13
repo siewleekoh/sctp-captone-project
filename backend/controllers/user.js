@@ -45,7 +45,7 @@ export const createAccount=(req,res)=>{
     const userEmail = JSON.stringify(data, ["user_email"]);
     logger.info(`User email: ${userEmail}...`);
 
-    // Check if the email is "abc@gmail.com"
+    // fake error - Check if the email is "abc@gmail.com"
     if (userEmail === '{"user_email":"abcd@gmail.com"}' ) {
         const errorMessage = "Cannot register user, please try again with a different email address.";
         logger.error(errorMessage);
