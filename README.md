@@ -1,4 +1,5 @@
-[![Build and push frontend/backend image to ECR and deploy to EKS](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_ecr_image.yml/badge.svg?branch=main)](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_ecr_image.yml)
+[![Build and push frontend/backend image to ECR and deploy to EKS](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_deploy_image.yml/badge.svg)](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_deploy_image.yml)
+
 # SCTP CE Capstone Project - Cohort 5 Group 2
 - This repo documents the capstone project as part of a course requirement for the NTU SCTP Cloud Infrastructure Engineering program.
 - The repo follows a gitflow branching strategy with main (stores official release history), develop (integrates features), feature and bugfix branches.
@@ -33,8 +34,15 @@ So let's get things cooking! 🍳
 - CI/CD: Github Actions
 
 ## Architecture Diagram 
-![image](https://github.com/StrawberriCake/restaurant-ordering-system/assets/153524202/c6a8c08e-27f3-4a9d-8ac1-c1bd839bf0f7)
+![](docs/images/architecture_diagram.png)
 
+- EKS Cluster: located in a private subnet and is used to deploy the frontend and backend application, as well as the fluentd logging agent.
+- RDS: located in a private subnet and used to store the application data like user details, menu items and orders.
+- Route53: used to route traffic to the EKS cluster.
+- Cloudwatch:  used to monitor the EKS cluster and the RDS instance.
+- Fluentd: used to collect logs from the EKS cluster and send it to Cloudwatch.
+- Grafana: used to visualize the Cloudwatch metrics.
+- SNS: used to send alerts to email.
 
 
 ## Website
