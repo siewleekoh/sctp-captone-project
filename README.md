@@ -169,9 +169,6 @@ Landing Page            |  Menu Page
 
   8. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
 
-## 3) Adding TLS certificate to the Ingress
-
-
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 
 1. namespace `amazon-cloudwatch` has already been created in terraform
