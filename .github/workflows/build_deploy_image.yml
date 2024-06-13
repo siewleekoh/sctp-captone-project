@@ -152,6 +152,18 @@ jobs:
           echo "Pushing frontend image to ECR..."
           docker push ${{ env.ECR_ENDPOINT }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
+      - name: generate env variables
+        uses: paramt/github-actions-playground@master
+        env:
+            VUE_APP_ROOT_API: ${{ env.VUE_APP_ROOT_API }}
+            VUE_APP_ALLOWED_HOST: ${{ env.VUE_APP_ALLOWED_HOST }}
+            MYSQL_HOST: ${{ env.MYSQL_HOST }}
+            MYSQL_USERNAME: ${{ env.MYSQL_USERNAME }}
+            MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+            MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+            MYSQL_PORT: ${{ env.MYSQL_PORT }}
+            BACKEND_PORT: ${{ env.BACKEND_PORT }}
+            NODE_ENV: ${{ env.NODE_ENV }}
 
       - name: Build and push backend image to ECR
         if: env.RUN_BACKEND_BUILD == 'true'
@@ -161,7 +173,15 @@ jobs:
           echo "build_backend is: $build_backend"
           echo "Building backend image..."
           
-          docker build --no-cache -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
+          docker build \
+          --build-arg NODE_ENV=${{ env.NODE_ENV }} \
+          --build-arg MYSQL_HOST=${{ env.MYSQL_HOST }} \
+          --build-arg MYSQL_USERNAME=${{ env.MYSQL_USERNAME }} \
+          --build-arg MYSQL_PASSWORD=${{ env.MYSQL_PASSWORD }} \
+          --build-arg MYSQL_DATABASE=${{ env.MYSQL_DATABASE }} \
+          --build-arg MYSQL_PORT=${{ env.MYSQL_PORT }} \
+          --build-arg BACKEND_PORT=${{ env.BACKEND_PORT }} \
+          --no-cache -t ${{ env.BACKEND_IMAGE_NAME }} ./backend
           
           docker tag ${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.ECR_ENDPOINT }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           echo "Pushing backend image to ECR..."
