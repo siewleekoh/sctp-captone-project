@@ -1,16 +1,24 @@
 FROM --platform=linux/amd64 node:18-alpine
 
-ARG NODE_ENV
-ARG MYSQL_HOST
-ARG MYSQL_USERNAME
-ARG MYSQL_PASSWORD
-ARG MYSQL_DATABASE
-ARG MYSQL_PORT
-ARG BACKEND_PORT
-
 WORKDIR /app
 
 COPY package*.json ./
+
+RUN --mount=type=secret,id=NODE_ENV \
+   --mount=type=secret,id=MYSQL_HOST \
+   --mount=type=secret,id=MYSQL_USERNAME \
+   --mount=type=secret,id=MYSQL_PASSWORD \
+   --mount=type=secret,id=MYSQL_DATABASE \
+   --mount=type=secret,id=MYSQL_PORT \
+   --mount=type=secret,id=BACKEND_PORT \
+   export API_ENDPOINT=$(cat /run/secrets/NODE_ENV) && \
+   export API_PASSWORD=$(cat /run/secrets/MYSQL_HOST) && \
+   export API_PASSWORD=$(cat /run/secrets/MYSQL_USERNAME) && \
+   export API_PASSWORD=$(cat /run/secrets/MYSQL_PASSWORD) && \
+   export API_PASSWORD=$(cat /run/secrets/MYSQL_DATABASE) && \
+   export API_PASSWORD=$(cat /run/secrets/MYSQL_PORT) && \
+   export API_PASSWORD=$(cat /run/secrets/BACKEND_PORT) && \
+   yarn gen
 
 RUN npm install
 
