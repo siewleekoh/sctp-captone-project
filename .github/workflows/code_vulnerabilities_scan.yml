@@ -89,7 +89,6 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          cd frontend
           snyk iac test --severity-threshold=high
           snyk iac test --severity-threshold=high --json > snyk_iac_report.json
       - name: Upload Snyk IaC Report
