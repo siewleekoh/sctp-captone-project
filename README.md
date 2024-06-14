@@ -1,3 +1,5 @@
+
+[![Code Vulnerability Scan](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/code_vulnerabilities_scan.yml/badge.svg)](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/code_vulnerabilities_scan.yml)
 [![Build and push frontend/backend image to ECR and deploy to EKS](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_deploy_image.yml/badge.svg)](https://github.com/StrawberriCake/restaurant-ordering-system/actions/workflows/build_deploy_image.yml)
 
 # SCTP CE Capstone Project - Cohort 5 Group 2

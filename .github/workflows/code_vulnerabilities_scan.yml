@@ -1,6 +1,8 @@
 name: Code Vulnerability Scan
-run-name: ${{ github.actor }} is running Continuous Integration on GitHub Actions 🚀
-on: [push]
+run-name: ${{ github.actor }} is running Code Scanning on GitHub Actions 🚀
+on:
+  pull_request:
+    branches: [develop, main]
 jobs:
   frontend-install-dependencies:
     runs-on: ubuntu-latest
@@ -18,7 +20,7 @@ jobs:
           cd frontend
           npm install
 
-  frontend-code-ql-scanning:
+  code-ql-scanning:
     name: Analyze (${{ matrix.language }})
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
@@ -42,7 +44,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
@@ -51,7 +53,7 @@ jobs:
 
   frontend-code-vulnerability-scanning:
     runs-on: ubuntu-latest
-    needs: [frontend-install-dependencies, frontend-code-ql-scanning]
+    needs: [frontend-install-dependencies, code-ql-scanning]
     outputs:
       status: ${{ job.status }}
     steps:
@@ -67,17 +69,59 @@ jobs:
         run: |
           cd frontend
           snyk test --severity-threshold=critical
-          snyk test --severity-threshold=critical --json > snyk-results.json
+          snyk test --severity-threshold=critical --json > frontend-snyk-results.json
 
       - name: Upload Snyk Scan Results
         uses: actions/upload-artifact@v4.3.0
         with:
           name: snyk-scan-results
-          path: snyk-results.json
+          path: frontend-snyk-results.json
 
-  frontend-iac-vulnerability-scanning:
+  backend-install-dependencies:
     runs-on: ubuntu-latest
-    needs: [frontend-install-dependencies, frontend-code-ql-scanning]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+
+  backend-code-vulnerability-scanning:
+    runs-on: ubuntu-latest
+    needs: [backend-install-dependencies, code-ql-scanning]
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Run Snyk to check for vulnerabilities
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          cd frontend
+          snyk test --severity-threshold=critical
+          snyk test --severity-threshold=critical --json > backend0snyk-results.json
+
+      - name: Upload Snyk Scan Results
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: snyk-scan-results
+          path: backend-snyk-results.json
+
+  iac-vulnerability-scanning:
+    runs-on: ubuntu-latest
+    needs: [frontend-install-dependencies, code-ql-scanning]
     outputs:
       status: ${{ job.status }}
     steps:
@@ -98,18 +142,20 @@ jobs:
           path: snyk_iac_report.json
 
   build_summary:
-    needs: [frontend-code-vulnerability-scanning, frontend-iac-vulnerability-scanning]
+    needs: [frontend-code-vulnerability-scanning, backend-code-vulnerability-scanning, iac-vulnerability-scanning]
     runs-on: ubuntu-latest
     steps:
       - name: Adding markdown
         run: |
-          CODE_SCAN_STATUS=${{ needs.code-vulnerability-scanning.outputs.status }}
+          FRONTEND_CODE_SCAN_STATUS=${{ needs.frontend-code-vulnerability-scanning.outputs.status }}
+          BACKEND_CODE_SCAN_STATUS=${{ needs.backend-code-vulnerability-scanning.outputs.status }}
           IAC_SCAN_STATUS=${{ needs.iac-vulnerability-scanning.outputs.status }}
 
           echo '## 🚀 Preparing Build Summary 🚀' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
 
-          echo "| Job Name        | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| code-scan       | $CODE_SCAN_STATUS |" >> $GITHUB_STEP_SUMMARY
-          echo "| iac-scan        | $IAC_SCAN_STATUS  |" >> $GITHUB_STEP_SUMMARY
+          echo "| Job Name                 | Status                     |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------------------------|----------------------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| frontend-code-scan       | $FRONTEND_CODE_SCAN_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| backend-code-scan        | $BACKEND_CODE_SCAN_STATUS  |" >> $GITHUB_STEP_SUMMARY
+          echo "| iac-scan                 | $IAC_SCAN_STATUS           |" >> $GITHUB_STEP_SUMMARY
