@@ -140,12 +140,13 @@ jobs:
           path: snyk_iac_report.json
 
   build_summary:
-    needs: [frontend-code-vulnerability-scanning, iac-vulnerability-scanning]
+    needs: [frontend-code-vulnerability-scanning, backend-code-vulnerability-scanning, iac-vulnerability-scanning]
     runs-on: ubuntu-latest
     steps:
       - name: Adding markdown
         run: |
           FRONTEND_CODE_SCAN_STATUS=${{ needs.frontend-code-vulnerability-scanning.outputs.status }}
+          BACKEND_CODE_SCAN_STATUS=${{ needs.backend-code-vulnerability-scanning.outputs.status }}
           IAC_SCAN_STATUS=${{ needs.iac-vulnerability-scanning.outputs.status }}
 
           echo '## 🚀 Preparing Build Summary 🚀' >> $GITHUB_STEP_SUMMARY
