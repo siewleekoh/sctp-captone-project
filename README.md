@@ -38,7 +38,8 @@ So let's get things cooking! 🍳
 ## Architecture Diagram 
 ![](docs/images/architecture_diagram.png)
 
-- EKS Cluster: located in a private subnet and is used to deploy the frontend and backend application, as well as the fluentd logging agent.
+- EKS Cluster: located in a private subnet and is used to deploy the frontend and backend application, TLS certificate manager,
+  as well as the fluentd logging agent.
 - RDS: located in a private subnet and used to store the application data like user details, menu items and orders.
 - Route53: used to route traffic to the EKS cluster.
 - Cloudwatch:  used to monitor the EKS cluster and the RDS instance.
@@ -169,7 +170,7 @@ Landing Page            |  Menu Page
     kubectl  describe issuer letsencrypt -n=restaurant
    ```
 
-  8. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
+  9. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
 
 ## 3) Logging - Deploying fluentd to enable EKS pod logging 
 
@@ -226,6 +227,7 @@ Landing Page            |  Menu Page
     ```
 
 ## 6) CI/CD - Deploying frontend/backend images to ECR and then EKS using Github Actions
+![](docs/images/cicd_build_deploy_ecr.png)
 - The `build_deploy_image.yml` pipeline is triggered when a push is made to any branches at the `frontend`/`backend` folder.
 - The pipeline builds the docker image, tags it with the `latest` tag and pushes it to ECR.
 - The pipeline then updates the deployment files with the new image tag and deploys the image to EKS.
