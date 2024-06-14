@@ -3,10 +3,16 @@ kind: Ingress
 metadata:
   name: ingress-nginx-restaurant
   namespace: restaurant
+  annotations:
+    cert-manager.io/issuer: "letsencrypt"
 spec: 
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - ce5-group2-food.sctp-sandbox.com
+      secretName: restaurant-tls
   rules:
-  - host: "ce5-group2-food.sctp-sandbox.com"
+  - host: ce5-group2-food.sctp-sandbox.com
     http:
       paths:
         - path: /
