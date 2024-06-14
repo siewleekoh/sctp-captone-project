@@ -3,7 +3,6 @@
 - To start the frontend and backend containers.
 
 ```
-docker build --no-cache -t test_frontend --build-arg VUE_APP_ROOT_API=http://ce5-group2-food.sctp-sandbox.com/api/v1 --build-arg VUE_APP_ALLOWED_HOST=.sctp-sandbox.com ./frontend
 cd deployment/docker-compose
 docker-compose up
 ```
