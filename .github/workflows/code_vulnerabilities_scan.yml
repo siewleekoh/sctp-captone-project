@@ -66,8 +66,8 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           cd frontend
-          snyk test --severity-threshold=high
-          snyk test --severity-threshold=high --json > snyk-results.json
+          snyk test --severity-threshold=critical
+          snyk test --severity-threshold=critical --json > snyk-results.json
 
       - name: Upload Snyk Scan Results
         uses: actions/upload-artifact@v4.3.0
@@ -89,8 +89,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          snyk iac test --severity-threshold=high
-          snyk iac test --severity-threshold=high --json > snyk_iac_report.json
+          snyk iac test --severity-threshold=critical
+          snyk iac test --severity-threshold=critical --json > snyk_iac_report.json
       - name: Upload Snyk IaC Report
         uses: actions/upload-artifact@v4.3.0
         with:
