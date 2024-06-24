@@ -172,35 +172,33 @@ Landing Page            |  Menu Page
 
   9. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
 
-## 3) Logging - Deploying fluentd to enable EKS pod logging 
+## 3) Prometheus Monitoring - Deploying Prometheus to monitor EKS cluster
+1. create namespace `monitoring`
+```
+kubectl create namespace monitoring
+```
 
-1. namespace `amazon-cloudwatch` has already been created in terraform
+2. helm install prometheus
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack
+```
 
-2. Create fluentd configmap: ```kubectl apply -f ./monitoring-logging/0-configmap.yaml -n=amazon-cloudwatch```
+3. port-forward to access Grafana and access it at `http://localhost:3000`
+```
+kubectl port-forward deployment/prometheus-grafana 3000
+user=admin
+password=prom-operator
+```
 
-3. Apply fluentd monitoring:```kubectl apply -f ./monitoring-logging/1-fluentd-logging.yaml -n=amazon-cloudwatch```
-
-4. Check AWS to ensure logs are flowing into cloudwatch.
-
-## 4) Dashboard - Deploying Grafana for AWS Cloudwatch Monitoring
-
-1. Install grafana using helm.
-        <details>
-        <summary open>
-        Code Snippet
-        </summary>
-
-        helm upgrade grafana grafana/grafana --namespace monitoring --set service.type=LoadBalancer --set adminPassword='EKS!sAWSome' 
+4. port-forward to access Prometheus and access it at `http://localhost:9090`
+```
+kubectl get pod
+kubectl port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090
+```
 
 
-2. Get your Grafana ELB URL using the below command. Update records in Route53 if required.
-        <details>
-        <summary open>
-        Code Snippet
-        </summary>
-
-        export ELB=$(kubectl get svc -n monitoring grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-        echo "http://$ELB"
 
 ## 5) MySQL - Accessing RDS MySQL Database in private subnet via Bastion Host
 - A EC2 bastion host has been created in the public subnet of the VPC with a `.pem` key and security group that allows SSH access from the user's IP.
