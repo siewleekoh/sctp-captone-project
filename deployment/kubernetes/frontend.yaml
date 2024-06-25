@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend-container
-        image: public.ecr.aws/u2q1a2y8/ce5_group2_frontend:latest
+        image: public.ecr.aws/u3m8u0c4/ce5_group2_frontend:latest
         imagePullPolicy: Always
         env:
           - name: HUB_HOST
