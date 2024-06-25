@@ -16,7 +16,7 @@ variable "aws_account_id" {
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-southeast-1"
 }
 
 variable "vpc_private_subnets" {
@@ -47,7 +47,7 @@ variable "mysql_password" {
 variable "eks_cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "ce5-group2-eks-cluster"
+  default     = "eks-cluster"
 }
 
 variable "user1_name" {

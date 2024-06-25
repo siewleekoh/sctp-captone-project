@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "sctp-ce5-tfstate-bucket-1"
+    bucket = "sctp-tfstate-bucket"
     key    = "ce5-group2-capstone-project.tfstate"
-    region = "us-east-1"
+    region = "ap-southeast-1"
   }
 }
