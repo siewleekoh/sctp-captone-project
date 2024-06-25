@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend-container
-        image: public.ecr.aws/u3m8u0c4/ce5_group2_frontend:latest
+        image: public.ecr.aws/u3m8u0c4/ce5-group2-frontend:latest
         imagePullPolicy: Always
         env:
           - name: HUB_HOST
@@ -38,7 +38,24 @@ spec:
   selector:
     app: restaurant-app
   ports:
-    - protocol: TCP
+    - name: webpage
+      protocol: TCP
       port: 7778
       targetPort: 80
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-service-monitor
+  namespace: monitoring
+  labels:
+    app: prometheus
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: restaurant-app
+  endpoints:
+    - port: webpage
+      interval: 30s

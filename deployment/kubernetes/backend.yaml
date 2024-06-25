@@ -33,7 +33,24 @@ spec:
   selector:
     app: restaurant-api
   ports:
-    - protocol: TCP
+    - name: app-api
+      protocol: TCP
       port: 8888
       targetPort: 8888
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-service-monitor
+  namespace: monitoring
+  labels:
+    app: prometheus
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: restaurant-api
+  endpoints:
+    - port: app-api
+      interval: 30s

@@ -140,7 +140,7 @@ Landing Page            |  Menu Page
   
     ```
     cd frontend
-    docker build --no-cache $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="") .
+    docker build --no-cache -t ce5-group2-frontend $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="") .
   
     cd backend
     docker build --no-cache -t ce5-group2-backend  $(for i in `cat .env`; do out+="--build-arg $i " ; done; echo $out;out="") .
@@ -150,8 +150,8 @@ Landing Page            |  Menu Page
 
     ```
     cd deployment/kubernetes
-    kubectl apply -f backend.yaml --namespace=restaurant
-    kubectl apply -f frontend.yaml --namespace=restaurant
+    kubectl apply -f backend.yaml
+    kubectl apply -f frontend.yaml
     kubectl apply -f ingress.yaml --namespace=restaurant
     ```
 
@@ -161,6 +161,11 @@ Landing Page            |  Menu Page
     kubectl get deployment -n=restaurant 
     kubectl get pods -n=restaurant
     kubectl logs <pod-name> -n=restaurant 
+    ```
+  8. To view prometheus service monitor
+    ```
+    kubectl get servicemonitors --namespace=monitoring
+
     ```
   8. Add TLS certificate to the EKS cluster
     ```
@@ -173,21 +178,17 @@ Landing Page            |  Menu Page
   9. Access the restaurant order page at https://ce5-group2-food.sctp-sandbox.com/
 
 ## 3) Prometheus Monitoring - Deploying Prometheus to monitor EKS cluster
-1. create namespace `monitoring`
-```
-kubectl create namespace monitoring
-```
 
-2. helm install prometheus
+1. helm install prometheus
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install prometheus prometheus-community/kube-prometheus-stack
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
 ```
 
-3. port-forward to access Grafana and access it at `http://localhost:3000`
+2. port-forward to access Grafana and access it at `http://localhost:3000`
 ```
-kubectl port-forward deployment/prometheus-grafana 3000
+kubectl port-forward deployment/prometheus-grafana 3000 --namespace=monitoring
 user=admin
 password=prom-operator
 ```
@@ -195,8 +196,8 @@ password=prom-operator
 4. port-forward to access Prometheus and access it at `http://localhost:9090`
 ```
 kubectl get pod
-kubectl port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090
-```
+kubectl port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090 --namespace=monitoring
+``` 
 
 
 
