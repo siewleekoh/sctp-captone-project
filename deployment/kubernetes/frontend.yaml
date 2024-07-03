@@ -14,17 +14,21 @@ spec:
         app: restaurant-app
     spec:
       containers:
-      - name: frontend-container
-        image: public.ecr.aws/u2q1a2y8/ce5_group2_frontend:latest
-        imagePullPolicy: Always
-        env:
-          - name: HUB_HOST
-            value: backend-service.restaurant
-          - name: HUB_PORT
-            value: "8888"
-        ports:
-          - containerPort: 80
-          
+        - name: frontend-container
+          image: public.ecr.aws/u3m8u0c4/ce5-group2-frontend:latest
+          imagePullPolicy: Always
+          env:
+            - name: HUB_HOST
+              value: backend-service.restaurant
+            - name: HUB_PORT
+              value: "8888"
+            - name: VUE_APP_ROOT_API
+              value: https://ce5-group2-food.sctp-class.com/api/v1
+            - name: VUE_APP_ALLOWED_HOST
+              value: .sctp-class.com
+          ports:
+            - containerPort: 80
+
 ---
 apiVersion: v1
 kind: Service
@@ -38,7 +42,24 @@ spec:
   selector:
     app: restaurant-app
   ports:
-    - protocol: TCP
+    - name: webpage
+      protocol: TCP
       port: 7778
       targetPort: 80
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-service-monitor
+  namespace: monitoring
+  labels:
+    app: prometheus
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: restaurant-app
+  endpoints:
+    - port: webpage
+      interval: 30s
